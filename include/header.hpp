@@ -6,9 +6,13 @@
 # include <string>
 # include <vector>
 # include <iterator>
-# define str std::string
 # include "location.hpp"
-# include "server.hpp"
+# include "Server.hpp"
+# include "socket.hpp"
+# include <stack>
+
+#include <sstream>
+#include <libc.h>
 
 Server	parse( int ac, char ** av );
 

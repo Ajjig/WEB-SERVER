@@ -1,6 +1,6 @@
 #include "../include/header.hpp"
 
-void split(str & buff, std::vector<str> & config) {
+void split(std::string & buff, std::vector<std::string> & config) {
 	for (size_t i = 0; i < buff.size(); i++) { // find "{;}"
 		if (buff[i] == ';' || buff[i] == '{' || buff[i] == '}') {
 			buff.insert(i, " ");
@@ -18,8 +18,8 @@ void split(str & buff, std::vector<str> & config) {
 	}
 }
 
-void validate(std::vector<str> & config) {
-	std::stack <str> stack;
+void validate(std::vector<std::string> & config) {
+	std::stack <std::string> stack;
 	for (size_t i = 0; i < config.size(); i++) {
 		if (config[i] == "{") {
 			stack.push("{");
@@ -42,9 +42,9 @@ void validate(std::vector<str> & config) {
 Server parse( int ac, char ** av ) {
 
 	std::fstream		file;
-	str					buff;
-	str					line;
-	std::vector<str>	config;
+	std::string					buff;
+	std::string					line;
+	std::vector<std::string>	config;
 
 	if (ac == 1)
 		file.open("./webserv.conf", std::ios::in);

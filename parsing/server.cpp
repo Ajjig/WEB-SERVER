@@ -1,7 +1,7 @@
 #include "../include/header.hpp"
 
 
-Server::Server( std::vector<str> config ) {
+Server::Server( std::vector<std::string> config ) {
 	parse(config);
 }
 
@@ -11,19 +11,19 @@ void Server::addLocation(Location location) {
 	locations.push_back(location);
 }
 
-void Server::addIndex(str ind) {
+void Server::addIndex(std::string ind) {
 	_indexes.push_back(ind);
 }
 
-void Server::setRoot(str root) {
+void Server::setRoot(std::string root) {
 	_root = root;
 }
 
-str Server::getRoot() {
+std::string Server::getRoot() {
 	return _root;
 }
 
-std::vector<str> Server::getIndexes() {
+std::vector<std::string> Server::getIndexes() {
 	return _indexes;
 }
 
@@ -31,22 +31,22 @@ std::vector<Location> Server::getLocations() {
 	return locations;
 }
 
-void Server::parse(std::vector<str> config) {
+void Server::parse(std::vector<std::string> config) {
 
 	for (size_t i = 0; i < config.size(); i++) {
 		if (config[i] == "index")
-			while (i + 1 >= config.size() || str("{:}").find(config[i + 1]) != std::string::npos) {
+			while (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
 				addIndex(config[i + 1]);
 				i++;
 			}
 		else if (config[i] == "root") {
-			if (i + 1 >= config.size() || str("{:}").find(config[i + 1]) != std::string::npos) {
+			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
 				std::cout << "Error: root must be followed by a path" << std::endl;
 				exit(EXIT_FAILURE);
 			}
 		}
 		else if (config[i] == "port") {
-			if (i + 1 >= config.size() || str("{:}").find(config[i + 1]) != std::string::npos) {
+			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
 				std::cout << "Error: port must be followed by a number" << std::endl;
 				exit(EXIT_FAILURE);
 			} else {
