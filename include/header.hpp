@@ -8,7 +8,7 @@
 # include <iterator>
 # define str std::string
 # include "location.hpp"
-# include "Server.hpp"
+# include "server.hpp"
 
 Server	parse( int ac, char ** av );
 
