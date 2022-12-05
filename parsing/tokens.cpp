@@ -39,7 +39,7 @@ void validate(std::vector<str> & config) {
 }
 
 
-void parse( int ac, char ** av ) {
+Server parse( int ac, char ** av ) {
 
 	std::fstream		file;
 	str					buff;
@@ -57,5 +57,8 @@ void parse( int ac, char ** av ) {
 	while (std::getline(file, line))
 		buff += line;
 	file.close();
+	split(buff, config); // split the config file into tokens
+	validate(config); // validate the config file
+	return Server(config);
 }
 

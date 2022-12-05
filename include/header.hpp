@@ -10,6 +10,6 @@
 # include "location.hpp"
 # include "Server.hpp"
 
-void	parse( int ac, char ** av );
+Server	parse( int ac, char ** av );
 
 #endif
