@@ -2,6 +2,10 @@
 
 
 Server::Server( std::vector<std::string> config ) {
+	_name = "webserv";
+	_port = 80;
+	_root = "./";
+	_host = "None";
 	parse(config);
 }
 
@@ -33,6 +37,8 @@ std::vector<Location> Server::getLocations() {
 
 void Server::parse(std::vector<std::string> config) {
 
+	int bracket = 0;
+
 	for (size_t i = 0; i < config.size(); i++) {
 		if (config[i] == "index")
 			while (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
@@ -57,5 +63,28 @@ void Server::parse(std::vector<std::string> config) {
 				}
 			}
 		}
+		else if (config[i] == "host") {
+			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
+				std::cout << "Error: host must be followed by a name" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			_host = config[i + 1];
+		}
+		else if (config[i] == "server_name") {
+			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
+				std::cout << "Error: name must be followed by a name" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			_name = config[i + 1];
+		}
+		///////
+		else if (config[i] == "}")
+			bracket--;
+		else if (config[i] == "{")
+			bracket++;
+		if (bracket == -1)
+			break;
 	}
+
+
 }

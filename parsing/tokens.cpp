@@ -59,6 +59,10 @@ Server parse( int ac, char ** av ) {
 	file.close();
 	split(buff, config); // split the config file into tokens
 	validate(config); // validate the config file
+	if (std::find(config.begin(), config.end(), "server") == config.end()) {
+		std::cout << "Error: invalid config ( missing 'server' )" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	return Server(config);
 }
 
