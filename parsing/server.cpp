@@ -51,7 +51,7 @@ void Server::parse(std::vector<std::string> config) {
 				exit(EXIT_FAILURE);
 			}
 		}
-		else if (config[i] == "port") {
+		else if (config[i] == "listen") {
 			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
 				std::cout << "Error: port must be followed by a number" << std::endl;
 				exit(EXIT_FAILURE);
@@ -85,6 +85,5 @@ void Server::parse(std::vector<std::string> config) {
 		if (bracket == -1)
 			break;
 	}
-
 
 }
