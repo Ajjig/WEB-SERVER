@@ -58,6 +58,11 @@ void Socket::listen()
     FD_ZERO(&readfds);
 }
 
+/**
+ * @brief Read file
+ * @param filename
+ * @return std::string 
+ */
 std::string Socket::read_file(char *filename)
 {
     std::ifstream inFile;
@@ -68,6 +73,7 @@ std::string Socket::read_file(char *filename)
         std::cout << "Error opening file" << std::endl;
         exit(1);
     }
+    // A stringstream associates a string object with a stream allowing you to read from the string as if it were a stream (like cin).
     std::stringstream strStream;
     strStream << inFile.rdbuf(); //read the file
   
