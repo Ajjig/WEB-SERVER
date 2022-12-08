@@ -1,7 +1,7 @@
 #include "../include/header.hpp"
 
 
-Server::Server( std::vector<std::string> config ) {
+Server::Server( std::vector<string> config ) {
 	_name = "webserv";
 	_port = 80;
 	_root = "./";
@@ -15,19 +15,19 @@ void Server::addLocation(Location location) {
 	locations.push_back(location);
 }
 
-void Server::addIndex(std::string ind) {
+void Server::addIndex(string ind) {
 	_indexes.push_back(ind);
 }
 
-void Server::setRoot(std::string root) {
+void Server::setRoot(string root) {
 	_root = root;
 }
 
-std::string Server::getRoot() {
+string Server::getRoot() {
 	return _root;
 }
 
-std::vector<std::string> Server::getIndexes() {
+std::vector<string> Server::getIndexes() {
 	return _indexes;
 }
 
@@ -35,24 +35,24 @@ std::vector<Location> Server::getLocations() {
 	return locations;
 }
 
-void Server::parse(std::vector<std::string> config) {
+void Server::parse(std::vector<string> config) {
 
 	int bracket = 0;
 
 	for (size_t i = 0; i < config.size(); i++) {
 		if (config[i] == "index")
-			while (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
+			while (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
 				addIndex(config[i + 1]);
 				i++;
 			}
 		else if (config[i] == "root") {
-			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
+			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
 				std::cout << "Error: root must be followed by a path" << std::endl;
 				exit(EXIT_FAILURE);
 			}
 		}
 		else if (config[i] == "listen") {
-			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
+			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
 				std::cout << "Error: port must be followed by a number" << std::endl;
 				exit(EXIT_FAILURE);
 			} else {
@@ -64,14 +64,14 @@ void Server::parse(std::vector<std::string> config) {
 			}
 		}
 		else if (config[i] == "host") {
-			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
+			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
 				std::cout << "Error: host must be followed by a name" << std::endl;
 				exit(EXIT_FAILURE);
 			}
 			_host = config[i + 1];
 		}
 		else if (config[i] == "server_name") {
-			if (i + 1 >= config.size() || std::string("{:}").find(config[i + 1]) != std::string::npos) {
+			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
 				std::cout << "Error: name must be followed by a name" << std::endl;
 				exit(EXIT_FAILURE);
 			}
@@ -85,5 +85,9 @@ void Server::parse(std::vector<std::string> config) {
 		if (bracket == -1)
 			break;
 	}
-
+	// std::cout << "port:     " << _port << std::endl;
+	// std::cout << "name:     " << _name << std::endl;
+	// //std::cout << "index[0]: " << _indexes[0] << std::endl;
+	// std::cout << "host:     " << _host << std::endl;
+	// std::cout << "root:     " << _root << std::endl;
 }

@@ -2,20 +2,20 @@
 #include <libc.h>
 class Server {
 	public:
-		Server( std::vector<std::string> config );
+		Server( std::vector<string> config );
 		~Server();
 		void addLocation(Location location);
-		void addIndex(std::string ind);
-		void setRoot(std::string root);
-		std::string getRoot();
-		std::vector<std::string> getIndexes();
+		void addIndex(string ind);
+		void setRoot(string root);
+		string getRoot();
+		std::vector<string> getIndexes();
 		std::vector<Location> getLocations();
 	private:
 		std::vector<Location> locations;
-		void parse(std::vector<std::string> config);
-		std::string _root;
-		std::string _name;
-		std::string _host;
+		void parse(std::vector<string> config);
+		string _root;
+		string _name;
+		string _host;
 		int _port;
-		std::vector<std::string> _indexes;
+		std::vector<string> _indexes;
 };

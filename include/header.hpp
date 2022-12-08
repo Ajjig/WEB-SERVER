@@ -14,6 +14,9 @@
 #include <sstream>
 #include <libc.h>
 
+typedef std::string string;
+
+
 Server	parse( int ac, char ** av );
 
 #endif

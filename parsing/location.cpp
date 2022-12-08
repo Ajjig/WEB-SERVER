@@ -1,29 +1,29 @@
 #include "../include/header.hpp"
 
-Location::Location(std::vector<std::string> config) {
+Location::Location(std::vector<string> config) {
 	parse(config);
 }
 
 Location::~Location() {}
 
 
-void Location::setRoot(std::string root) {
+void Location::setRoot(string root) {
 	_root = root;
 }
 
-std::string Location::getRoot() {
+string Location::getRoot() {
 	return _root;
 }
 
-void Location::addIndex(std::string index) {
+void Location::addIndex(string index) {
 	_indexes.push_back(index);
 }
 
-std::vector<std::string> Location::getIndexes() {
+std::vector<string> Location::getIndexes() {
 	return _indexes;
 }
 
-void Location::parse(std::vector<std::string> config) {
+void Location::parse(std::vector<string> config) {
 
 	for (size_t i = 0; i < config.size(); i++) {
 		if (config[i] == "root") {
