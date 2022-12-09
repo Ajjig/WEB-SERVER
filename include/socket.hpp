@@ -18,9 +18,11 @@
 #include <strings.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 
 #define MAX_EVENTS 10
-#define PORT 80
 #define MAX_FD 200
 
 class Socket
@@ -35,12 +37,16 @@ class Socket
         char buffer[BUFSIZ];
         char http_header[BUFSIZ];
         int close_connection;
-
+        int REQ_COUNT;
         std::string construct_response();
         std::string read_file(char *filename);
+        int _port;
+        std::string _host;
 
     public:
         Socket();
+        Socket(int port, std::string host);
+        Socket(int port);
         ~Socket();
         int set_nonblocking(int sockfd);
         int init_socket();
@@ -49,7 +55,7 @@ class Socket
         void set_incoming_connection();
         void read_fd();
         void write_fd();
-
+        void log_client_info();
         void start();
 
         int get_port();

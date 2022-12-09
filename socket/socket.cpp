@@ -1,6 +1,20 @@
 #include "../include/socket.hpp"
 
-Socket::Socket() : nfds(1)
+Socket::Socket() : nfds(1), REQ_COUNT(0), _port(0), _host("0.0.0.0")
+{
+	master_socket = this->init_socket();
+	this->set_nonblocking(master_socket);
+	this->init_poll();
+}
+
+Socket::Socket(int port, std::string host) : nfds(1), REQ_COUNT(0), _port(port), _host(host)
+{
+	master_socket = this->init_socket();
+	this->set_nonblocking(master_socket);
+	this->init_poll();
+}
+
+Socket::Socket(int port) : nfds(1), REQ_COUNT(0), _port(port), _host("0.0.0.0")
 {
 	master_socket = this->init_socket();
 	this->set_nonblocking(master_socket);
@@ -9,7 +23,6 @@ Socket::Socket() : nfds(1)
 
 Socket::~Socket()
 {
-	// close(epfd);
 	close(master_socket);
 }
 
@@ -23,22 +36,22 @@ int Socket::init_socket()
 
 	bzero(&local, sizeof(local));
     local.sin_family = AF_INET;
-    local.sin_addr.s_addr = htonl(INADDR_ANY);;
-    local.sin_port = htons(this->get_port());
-
+    local.sin_addr.s_addr = inet_addr((_host.c_str()));
+    local.sin_port = htons(_port);
+	
 	int optval = 1;
 	if (setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
 	{
-		perror("setsockopt");
+		perror("setsockopt ");
 		exit(1);
 	}
-
+	
 	if( bind(master_socket, (struct sockaddr *) &local, sizeof(local)) < 0) {
-        perror("bind\n");
+        perror("bind ");
         exit(1);
     }
-    listen(master_socket, MAX_FD);
 
+    listen(master_socket, MAX_FD);
 	return master_socket;
 }
 
@@ -47,7 +60,6 @@ void Socket::init_poll()
 	memset(fds, 0, sizeof(fds));
 	fds[0].fd = master_socket;
 	fds[0].events = 0 | POLLIN;
-	// nfds++;
 }
 
 int Socket::set_nonblocking(int sockfd)
@@ -59,6 +71,13 @@ int Socket::set_nonblocking(int sockfd)
 	return 1;
 }
 
+void Socket::log_client_info()
+{
+	REQ_COUNT++;
+	std::cout << "Request N : " << REQ_COUNT << " | Client connected from at host -> " << inet_ntoa(remote.sin_addr) \
+		 << " at internal client Port -> " << ntohs(remote.sin_port) << std::endl;
+}
+
 void Socket::set_incoming_connection()
 {
 	while ((incoming_connection = accept(master_socket,(struct sockaddr *) &remote, &addrlen)) > 0)
@@ -68,7 +87,7 @@ void Socket::set_incoming_connection()
 		fds[nfds].fd = incoming_connection;
 		fds[nfds].events = 0 | POLLIN;
 		nfds++;
-		std::cout << "New connection : " << incoming_connection <<std::endl;
+		log_client_info();
 	}
 	if (incoming_connection == -1)
 	{
@@ -93,14 +112,12 @@ void Socket::read_fd()
 	else if (nread == 0)
 	{
 		perror("Client disconnected upexpectedly");
-		// close(fd);
 		fds[i].fd = -1;
 		nfds--;
 	}
 	else
 	{
 		fds[i].events = POLLOUT;
-		std::cout << "Read " << n << " bytes from socket " << fd << std::endl;
 	}
 
 }
@@ -155,7 +172,6 @@ void Socket::start()
 					}
 					else
 					{
-						std::cout << "Reading from socket " << fd << std::endl;
 						read_fd();
 					}
 
@@ -171,7 +187,7 @@ void Socket::start()
 
 int Socket::get_port()
 {
-	return PORT; // to be changed later
+	return _port; // to be changed later
 }
 
 // Private methods
@@ -188,7 +204,6 @@ std::string Socket::read_file(char *filename)
     if (not inFile.is_open())
     {
         std::cout << "Error opening file" << std::endl;
-        // exit(1);
     }
     /* A stringstream associates a string object with a stream allowing you
 	to read from the string as if it were a stream (like cin). */
@@ -205,8 +220,7 @@ std::string Socket::construct_response()
 
     std::string response = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " \
         + std::to_string(file_size) + "\n\n" + out;
-    // std::string response = std::string("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ") \
-    //     + std::string("5") + std::string("\n\n") + std::string("Hello");
+
 
     return response ;
 }
