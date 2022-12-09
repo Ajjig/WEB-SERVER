@@ -12,7 +12,7 @@ Server::Server( std::vector<string> config ) {
 Server::~Server() {}
 
 void Server::addLocation(Location location) {
-	locations.push_back(location);
+	_locations.push_back(location);
 }
 
 void Server::addIndex(string ind) {
@@ -32,7 +32,7 @@ std::vector<string> Server::getIndexes() {
 }
 
 std::vector<Location> Server::getLocations() {
-	return locations;
+	return _locations;
 }
 
 void Server::parse(std::vector<string> config) {
@@ -77,6 +77,14 @@ void Server::parse(std::vector<string> config) {
 			}
 			_name = config[i + 1];
 		}
+		else if (config[i] == "location") {
+			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
+				std::cout << "Error: location must be followed by a path" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			_locationPaths.push_back(config[i + 1]);
+			_locations.push_back(Location(config, ++i));
+		}
 		///////
 		else if (config[i] == "}")
 			bracket--;
@@ -85,9 +93,27 @@ void Server::parse(std::vector<string> config) {
 		if (bracket == -1)
 			break;
 	}
-	// std::cout << "port:     " << _port << std::endl;
-	// std::cout << "name:     " << _name << std::endl;
-	// //std::cout << "index[0]: " << _indexes[0] << std::endl;
-	// std::cout << "host:     " << _host << std::endl;
-	// std::cout << "root:     " << _root << std::endl;
+}
+
+void Server::put( void ) {
+	std::cout << "port:     " << _port << std::endl;
+	std::cout << "name:     " << _name << std::endl;
+	for (size_t i = 0; i < _indexes.size(); i++)
+		std::cout << "index[0]: " << _indexes[i] << std::endl;
+	std::cout << "host:     " << _host << std::endl;
+	std::cout << "root:     " << _root << std::endl;
+	std::cout << "LOCATIONS:" << std::endl;
+	for (size_t i = 0; i < _locations.size(); i++) {
+		std::cout << "Locaton '" << _locationPaths[i] << "' :" << std::endl;
+		std::cout << "   Root: " <<  _locations[i].getRoot() << std::endl;
+		std::cout << "   Indexes: ";
+		for (size_t j = 0; j < _locations[i].getIndexes().size(); j++)
+			std::cout << _locations[i].getIndexes()[j] << ", ";
+		std::cout << std::endl;
+		std::cout << "Allowed methods :" << std::endl << "   ";
+		for (size_t j = 0; j < _locations[i].getAllowed().size(); j++)
+			std::cout << _locations[i].getAllowed()[j] << ", ";
+		std::cout << std::endl;
+		std::cout << std::endl;
+	}
 }

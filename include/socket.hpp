@@ -9,8 +9,17 @@
 #include <sys/wait.h>    
 #include <netinet/in.h>    
 #include <netinet/tcp.h>    
+<<<<<<< HEAD
 #include <poll.h>    
 #include <sys/sendfile.h>    
+=======
+
+// error
+#include <sys/epoll.h>    
+#include <sys/sendfile.h>
+// end
+
+>>>>>>> 55d92d3e6834058e454b24cef2e7d0617977b910
 #include <sys/stat.h>    
 #include <unistd.h>    
 #include <stdio.h>    
