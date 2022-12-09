@@ -1,5 +1,7 @@
+#pragma once
+
 #include "header.hpp"
-#include <libc.h>
+
 class Server {
 	public:
 		Server( std::vector<string> config );

@@ -10,9 +10,25 @@
 # include "Server.hpp"
 # include "socket.hpp"
 # include <stack>
+#include <iostream>
 
 #include <sstream>
-#include <libc.h>
+#include <sys/socket.h>    
+#include <sys/wait.h>    
+#include <netinet/in.h>    
+#include <netinet/tcp.h>    
+#include <sys/epoll.h>    
+#include <sys/sendfile.h>    
+#include <sys/stat.h>    
+#include <unistd.h>    
+#include <stdio.h>    
+#include <stdlib.h>    
+#include <string.h>    
+#include <strings.h>    
+#include <fcntl.h>    
+#include <errno.h>     
+
+
 
 typedef std::string string;
 

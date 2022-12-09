@@ -1,22 +1,38 @@
 #pragma once
 
-#include "../include/header.hpp"
+#include <iostream>
+#include <sstream>
+#include <string>
 
-#define PORT 80
-#define MAXLINES 1024
+# include <fstream>
+#include <sys/socket.h>    
+#include <sys/wait.h>    
+#include <netinet/in.h>    
+#include <netinet/tcp.h>    
+#include <sys/epoll.h>    
+#include <sys/sendfile.h>    
+#include <sys/stat.h>    
+#include <unistd.h>    
+#include <stdio.h>    
+#include <stdlib.h>    
+#include <string.h>    
+#include <strings.h>    
+#include <fcntl.h>    
+#include <errno.h>     
+
+#define MAX_EVENTS 10    
+#define PORT 80   
+#define MAX_FD 20
 
 class Socket
 {
     private:
-        int server_fd; 
-        int new_socket;
-        int ready_descriptor;
-
-        struct sockaddr_in server_address, client_address;
-        fd_set readfds;
-        socklen_t addrlen_cli;
-        pid_t childpid;
-        char buffer[MAXLINES];
+        struct epoll_event ev, events[MAX_EVENTS];    
+        socklen_t addrlen;
+        int master_socket, incoming_connection, N_Files_discriptors, epfd, fd, i, nread, n;    
+        struct sockaddr_in local, remote;    
+        char buffer[BUFSIZ];
+        char http_header[BUFSIZ];
         
         std::string construct_response();
         std::string read_file(char *filename);
@@ -24,8 +40,17 @@ class Socket
     public:
         Socket();
         ~Socket();
-        void bind();
-        void listen();
-        void accept_socket();
+        int set_nonblocking(int sockfd);
+        int init_socket();
+        void init_epoll();
+
+        void set_incoming_connection();
+        void read_fd();
+        void write_fd();
+
         void start();
+
+        int get_port();
+        std::string get_host();
+        std::string get_http_header();
 };
