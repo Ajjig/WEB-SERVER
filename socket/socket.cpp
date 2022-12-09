@@ -167,17 +167,6 @@ void Socket::setup_multiple_interface(std::map<std::string, std::string> interfa
 
 void Socket::start()
 {
-	// init master socket 1
-	// int test;
-	// test = this->init_socket(80, "0.0.0.0");
-	// this->set_nonblocking(test);
-	// this->init_poll(test);
-
-	// // init master socket 2
-	// test = this->init_socket(8080, "0.0.0.0");
-	// this->set_nonblocking(test);
-	// this->init_poll(test);
-
 	setup_multiple_interface(__interface_list);
 
 	for (;;)
