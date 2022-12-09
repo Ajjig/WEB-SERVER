@@ -67,11 +67,28 @@ int Socket::set_nonblocking(int sockfd)
 	return 1;
 }
 
-void Socket::log_client_info()
+void Socket::log_client_info(int master_socket)
 {
 	REQ_COUNT++;
-	std::cout << "Request N : " << REQ_COUNT << " | Client connected from at host -> " << inet_ntoa(remote.sin_addr) \
-		 << " at internal client Port -> " << ntohs(remote.sin_port) << std::endl;
+	std::cout << "\tNew client on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
+}
+
+int Socket::current_interface_index(int _master_socket_fd)
+{
+	for (int i = 0; i < master_socket_list.size(); ++i)
+	{
+		if (_master_socket_fd == master_socket_list[i])
+			return i;
+	}
+	return -1;
+}
+
+std::string Socket::get_port_from_fd(int _master_socket_fd)
+{
+	int index = current_interface_index(_master_socket_fd);
+	std::map<std::string, std::string>::iterator it = __interface_list.begin();
+	std::advance(it, index);
+	return it->first;
 }
 
 void Socket::set_incoming_connection()
@@ -83,7 +100,7 @@ void Socket::set_incoming_connection()
 		fds[nfds].fd = incoming_connection;
 		fds[nfds].events = 0 | POLLIN;
 		nfds++;
-		log_client_info();
+		log_client_info(master_socket);
 	}
 	if (incoming_connection == -1)
 	{
@@ -162,6 +179,10 @@ void Socket::setup_multiple_interface(std::map<std::string, std::string> interfa
 		this->set_nonblocking(test);
 		this->init_poll(test);
 	}
+
+	std::cout << " * Running on http://" << this->_host <<  ":" << this->_port << " \033[31m(Press CTRL+C to quit)\033[0m" <<  std::endl;
+	std::cout  << " * Restarting with stat" << std::endl;
+	std::cout << " * Debugger is\033[32m active!\033[0m\n" << std::endl;
 }
 
 

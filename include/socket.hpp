@@ -46,6 +46,8 @@ class Socket
         std::string _host;
         std::vector<int> master_socket_list;
         std::map<std::string, std::string> __interface_list;
+        int current_interface_index(int _master_socket_fd);
+        std::string get_port_from_fd(int _master_socket_fd);
 
     public:
         Socket(std::map<std::string, std::string> interface_list);
@@ -57,7 +59,7 @@ class Socket
         void set_incoming_connection();
         void read_fd();
         void write_fd();
-        void log_client_info();
+        void log_client_info(int master_socket);
         void start();
         int is_master_socket(int fd);
         void setup_multiple_interface(std::map<std::string, std::string> interface_list);
