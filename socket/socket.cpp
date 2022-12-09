@@ -1,15 +1,15 @@
 #include "../include/socket.hpp"
 
-Socket::Socket()
+Socket::Socket() : nfds(1)
 {
 	master_socket = this->init_socket();
 	this->set_nonblocking(master_socket);
-	this->init_epoll();
+	this->init_poll();
 }
 
 Socket::~Socket()
 {
-	close(epfd);
+	// close(epfd);
 	close(master_socket);
 }
 
@@ -20,10 +20,7 @@ int Socket::init_socket()
         exit(1);    
     }
 
-	if( (master_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {    
-        perror("sockfd\n");    
-        exit(1);    
-    }    
+ 
 	bzero(&local, sizeof(local)); 
     local.sin_family = AF_INET;    
     local.sin_addr.s_addr = htonl(INADDR_ANY);;    
@@ -45,19 +42,12 @@ int Socket::init_socket()
 	return master_socket;
 }
 
-void Socket::init_epoll()
+void Socket::init_poll()
 {
-	epfd = epoll_create(MAX_EVENTS);    
-    if (epfd == -1) {    
-        perror("epoll_create");    
-        exit(EXIT_FAILURE);    
-    }      
-    ev.events = EPOLLIN;    
-    ev.data.fd = master_socket;    
-    if (epoll_ctl(epfd, EPOLL_CTL_ADD, master_socket, &ev) == -1) {    
-        perror("epoll_ctl: listen_sock");    
-        exit(EXIT_FAILURE);    
-    }
+	memset(fds, 0, sizeof(fds));
+	fds[0].fd = master_socket;
+	fds[0].events = 0 | POLLIN;
+	// nfds++;
 }
 
 int Socket::set_nonblocking(int sockfd)
@@ -73,13 +63,11 @@ void Socket::set_incoming_connection()
 	while ((incoming_connection = accept(master_socket,(struct sockaddr *) &remote, &addrlen)) > 0) 
 	{    
 		set_nonblocking(incoming_connection); 
-		ev.events = EPOLLIN | EPOLLET;
-		ev.data.fd = incoming_connection;    
-		if (epoll_ctl(epfd, EPOLL_CTL_ADD, incoming_connection,&ev) == -1) 
-		{    
-			perror("epoll_ctl: add");    
-			exit(EXIT_FAILURE);    
-		}    
+		// using poll 
+		fds[nfds].fd = incoming_connection;
+		fds[nfds].events = 0 | POLLIN;
+		nfds++;   
+		std::cout << "New connection : " << incoming_connection <<std::endl;
 	}    
 	if (incoming_connection == -1) 
 	{    
@@ -95,16 +83,25 @@ void Socket::read_fd()
 	{    
 		n += nread;    
 	}    
+	
 	if (nread == -1 && errno != EAGAIN) 
-		perror("read error");
-
-	ev.data.fd = fd;    
-	ev.events = events[i].events | EPOLLOUT;    
-
-	if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1) 
 	{    
-		perror("epoll_ctl: mod");    
-	}  
+		perror("read error");    
+		close(fd);
+	}    
+	else if (nread == 0) 
+	{    
+		perror("Client disconnected upexpectedly");
+		// close(fd);    
+		fds[i].fd = -1;
+		nfds--;
+	}    
+	else 
+	{    
+		fds[i].events = POLLOUT;
+		std::cout << "Read " << n << " bytes from socket " << fd << std::endl;
+	}
+	
 }
 
 void Socket::write_fd()
@@ -125,34 +122,47 @@ void Socket::write_fd()
 		}    
 		n -= nwrite;    
 	}    
-	close(fd);    
+	close(fd);
+	fds[i].fd = -1; 
 }
 
 void Socket::start()
 {
 	for (;;)
 	{
-		N_Files_discriptors = epoll_wait(epfd, events, MAX_EVENTS, -1); 
-		if (N_Files_discriptors == -1) 
-		{    
-			perror("epoll_pwait");    
-			exit(EXIT_FAILURE);    
-		}
-		for (i = 0; i < N_Files_discriptors; ++i)
+		// using poll instead of epoll
+		int ret = poll(fds, nfds, 0);
+		if (ret  == -1)
 		{
-			fd = events[i].data.fd;    
-            if (fd == master_socket) 
+			perror("poll");
+			exit(EXIT_FAILURE);
+		}
+		else if (ret > 0)
+		{
+			N_Files_discriptors = nfds;
+
+
+			for (i = 0; i < N_Files_discriptors; ++i)
 			{
-				set_incoming_connection();
-				continue;
-			}
-			if (events[i].events & EPOLLIN) 
-			{
-				read_fd();
-			}
-			if (events[i].events & EPOLLOUT)
-			{
-				write_fd();
+				fd = fds[i].fd; 
+				if (fds[i].revents & POLLIN)
+				{
+					if (fd == master_socket) 
+					{
+						set_incoming_connection();
+						continue;
+					}
+					else
+					{
+						std::cout << "Reading from socket " << fd << std::endl;
+						read_fd();
+					}
+
+				}
+				else if (fds[i].revents & POLLOUT)
+				{
+					write_fd();
+				}
 			}
 		}
 	}
@@ -177,7 +187,7 @@ std::string Socket::read_file(char *filename)
     if (not inFile.is_open())
     {
         std::cout << "Error opening file" << std::endl;
-        exit(1);
+        // exit(1);
     }
     /* A stringstream associates a string object with a stream allowing you 
 	to read from the string as if it were a stream (like cin). */
@@ -189,11 +199,13 @@ std::string Socket::read_file(char *filename)
 
 std::string Socket::construct_response()
 {
-    std::string out = read_file((char *)"../html/index.html");
+    std::string out = read_file((char *)"./html/index.html");
     int file_size = out.length();
 
     std::string response = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " \
         + std::to_string(file_size) + "\n\n" + out;
+    // std::string response = std::string("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ") \
+    //     + std::string("5") + std::string("\n\n") + std::string("Hello");
 
     return response ;
 }

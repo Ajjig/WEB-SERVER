@@ -9,7 +9,7 @@
 #include <sys/wait.h>    
 #include <netinet/in.h>    
 #include <netinet/tcp.h>    
-#include <sys/epoll.h>    
+#include <poll.h>    
 #include <sys/sendfile.h>    
 #include <sys/stat.h>    
 #include <unistd.h>    
@@ -22,17 +22,20 @@
 
 #define MAX_EVENTS 10    
 #define PORT 80   
-#define MAX_FD 20
+#define MAX_FD 200
 
 class Socket
 {
     private:
-        struct epoll_event ev, events[MAX_EVENTS];    
+        // using poll instead of epoll
+        struct pollfd fds[MAX_FD];
+        int nfds;
         socklen_t addrlen;
-        int master_socket, incoming_connection, N_Files_discriptors, epfd, fd, i, nread, n;    
+        int master_socket, incoming_connection, N_Files_discriptors, pfd, fd, i, nread, n;    
         struct sockaddr_in local, remote;    
         char buffer[BUFSIZ];
         char http_header[BUFSIZ];
+        int close_connection;
         
         std::string construct_response();
         std::string read_file(char *filename);
@@ -42,7 +45,7 @@ class Socket
         ~Socket();
         int set_nonblocking(int sockfd);
         int init_socket();
-        void init_epoll();
+        void init_poll();
 
         void set_incoming_connection();
         void read_fd();
