@@ -2,18 +2,18 @@
 
 class Location {
 	public:
-		Location(std::vector<string> config);
+		Location(std::vector<std::string> config);
 		~Location();
-		void setPath(string path);
-		string getPath();
-		void setRoot(string root);
-		string getRoot();
-		void addIndex(string index);
-		std::vector<string> getIndexes();
-		void parse(std::vector<string> config);
+		void setPath(std::string path);
+		std::string getPath();
+		void setRoot(std::string root);
+		std::string getRoot();
+		void addIndex(std::string index);
+		std::vector<std::string> getIndexes();
+		void parse(std::vector<std::string> config);
 
 
 	private:
-		string					_root;
-		std::vector<string>	_indexes;
+		std::string					_root;
+		std::vector<std::string>	_indexes;
 };
