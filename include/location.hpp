@@ -13,6 +13,7 @@ class Location {
 		void parse(std::vector<std::string> & config, size_t & i);
 		void setAllowed(std::string allowed);
 		std::vector<std::string> getAllowed();
+		bool isAllowed(std::string method);
 
 
 	private:
