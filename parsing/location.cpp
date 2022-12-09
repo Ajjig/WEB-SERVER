@@ -1,11 +1,20 @@
 #include "../include/header.hpp"
 
-Location::Location(std::vector<string> config) {
-	parse(config);
+Location::Location(std::vector<string> & config, size_t & i) {
+	_root = "./";
+	_indexes.push_back("index.html");
+	parse(config, i);
 }
 
 Location::~Location() {}
 
+std::vector<string> Location::getAllowed() {
+	return _allowed;
+}
+
+void Location::setAllowed(std::string method) {
+	_allowed.push_back(method);
+}
 
 void Location::setRoot(string root) {
 	_root = root;
@@ -23,15 +32,15 @@ std::vector<string> Location::getIndexes() {
 	return _indexes;
 }
 
-void Location::parse(std::vector<string> config) {
+void Location::parse(std::vector<string> & config, size_t & i) {
 
-	for (size_t i = 0; i < config.size(); i++) {
+	for ( ; i < config.size(); i++) {
 		if (config[i] == "root") {
-			setRoot(config[i + 1]);
 			if (config[++i] == ";") {
 				std::cout << "Error: root must be followed by a path" << std::endl;
-				break;
+				exit(EXIT_FAILURE);
 			}
+			setRoot(config[i]);
 		}
 		else if (config[i] == "index") {
 			while (config[i] != ";") {
@@ -39,10 +48,17 @@ void Location::parse(std::vector<string> config) {
 				i++;
 			}
 		}
-		else {
-			std::cout << "Error: unknown token '"<< config[i] << "' (ignored)" << std::endl;
-			while (config[i] != ";")
-				i++;
+		else if (config[i] == "allow") {
+			while (config[++i] != ";") {
+				if (METHODS.find(config[i]) > METHODS.size()) {
+					std::cerr << "Error: method '" << config[i] << "' is unknown" << std::endl;
+					exit(EXIT_FAILURE);
+				}
+				setAllowed(config[i]);
+			}
+		}
+		else if (config[i] == "}") {
+			return ;
 		}
 	}
 }

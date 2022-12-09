@@ -2,7 +2,7 @@
 
 class Location {
 	public:
-		Location(std::vector<std::string> config);
+		Location(std::vector<std::string> & config, size_t & i);
 		~Location();
 		void setPath(std::string path);
 		std::string getPath();
@@ -10,10 +10,13 @@ class Location {
 		std::string getRoot();
 		void addIndex(std::string index);
 		std::vector<std::string> getIndexes();
-		void parse(std::vector<std::string> config);
+		void parse(std::vector<std::string> & config, size_t & i);
+		void setAllowed(std::string allowed);
+		std::vector<std::string> getAllowed();
 
 
 	private:
 		std::string					_root;
 		std::vector<std::string>	_indexes;
+		std::vector<std::string>	_allowed;
 };

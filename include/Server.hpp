@@ -12,8 +12,11 @@ class Server {
 		std::string getRoot();
 		std::vector<std::string> getIndexes();
 		std::vector<Location> getLocations();
+		void put();
 	private:
-		std::vector<Location> locations;
+		std::vector<Location> _locations;
+		std::vector<std::string> _locationPaths;
+
 		void parse(std::vector<std::string> config);
 		std::string _root;
 		std::string _name;
@@ -21,3 +24,5 @@ class Server {
 		int _port;
 		std::vector<std::string> _indexes;
 };
+
+std::ostream & operator<<(std::ostream & out, Server const &server);
