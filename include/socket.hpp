@@ -5,32 +5,22 @@
 #include <string>
 
 # include <fstream>
-#include <sys/socket.h>    
-#include <sys/wait.h>    
-#include <netinet/in.h>    
-#include <netinet/tcp.h>    
-<<<<<<< HEAD
-#include <poll.h>    
-#include <sys/sendfile.h>    
-=======
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <poll.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <fcntl.h>
+#include <errno.h>
 
-// error
-#include <sys/epoll.h>    
-#include <sys/sendfile.h>
-// end
-
->>>>>>> 55d92d3e6834058e454b24cef2e7d0617977b910
-#include <sys/stat.h>    
-#include <unistd.h>    
-#include <stdio.h>    
-#include <stdlib.h>    
-#include <string.h>    
-#include <strings.h>    
-#include <fcntl.h>    
-#include <errno.h>     
-
-#define MAX_EVENTS 10    
-#define PORT 80   
+#define MAX_EVENTS 10
+#define PORT 80
 #define MAX_FD 200
 
 class Socket
@@ -40,15 +30,15 @@ class Socket
         struct pollfd fds[MAX_FD];
         int nfds;
         socklen_t addrlen;
-        int master_socket, incoming_connection, N_Files_discriptors, pfd, fd, i, nread, n;    
-        struct sockaddr_in local, remote;    
+        int master_socket, incoming_connection, N_Files_discriptors, pfd, fd, i, nread, n;
+        struct sockaddr_in local, remote;
         char buffer[BUFSIZ];
         char http_header[BUFSIZ];
         int close_connection;
-        
+
         std::string construct_response();
         std::string read_file(char *filename);
-    
+
     public:
         Socket();
         ~Socket();
