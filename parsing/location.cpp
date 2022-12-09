@@ -12,6 +12,10 @@ std::vector<string> Location::getAllowed() {
 	return _allowed;
 }
 
+bool Location::isAllowed(std::string method) {
+	return (std::find(_allowed.begin(), _allowed.end(), method) != _allowed.end());
+}
+
 void Location::setAllowed(std::string method) {
 	_allowed.push_back(method);
 }

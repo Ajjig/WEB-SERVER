@@ -1,24 +1,9 @@
 #include "../include/socket.hpp"
 
-Socket::Socket() : nfds(1), REQ_COUNT(0), _port(0), _host("0.0.0.0")
+Socket::Socket(std::map<std::string, std::string> interface_list) : nfds(1), REQ_COUNT(0)
 {
-	master_socket = this->init_socket();
-	this->set_nonblocking(master_socket);
-	this->init_poll();
-}
-
-Socket::Socket(int port, std::string host) : nfds(1), REQ_COUNT(0), _port(port), _host(host)
-{
-	master_socket = this->init_socket();
-	this->set_nonblocking(master_socket);
-	this->init_poll();
-}
-
-Socket::Socket(int port) : nfds(1), REQ_COUNT(0), _port(port), _host("0.0.0.0")
-{
-	master_socket = this->init_socket();
-	this->set_nonblocking(master_socket);
-	this->init_poll();
+	__interface_list = interface_list;
+	memset(fds, 0, sizeof(fds));
 }
 
 Socket::~Socket()
@@ -26,13 +11,19 @@ Socket::~Socket()
 	close(master_socket);
 }
 
-int Socket::init_socket()
+int Socket::init_socket(int defined_port, std::string defined_host)
 {
+	_port = defined_port;
+	_host = defined_host;
 	if( (master_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("sockfd\n");
+		perror("sockfd ");
+		exit(1);
+	}
+
+	if( (master_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("sockfd ");
         exit(1);
     }
-
 
 	bzero(&local, sizeof(local));
     local.sin_family = AF_INET;
@@ -55,11 +46,16 @@ int Socket::init_socket()
 	return master_socket;
 }
 
-void Socket::init_poll()
+void Socket::init_poll(int defined_master_socket)
 {
-	memset(fds, 0, sizeof(fds));
-	fds[0].fd = master_socket;
-	fds[0].events = 0 | POLLIN;
+	static int interface_index = 0;
+
+	
+	fds[interface_index].fd = defined_master_socket;
+	fds[interface_index].events = 0 | POLLIN;
+	interface_index++;
+	nfds = interface_index;
+	master_socket_list.push_back(defined_master_socket);
 }
 
 int Socket::set_nonblocking(int sockfd)
@@ -144,8 +140,46 @@ void Socket::write_fd()
 	fds[i].fd = -1;
 }
 
+int Socket::is_master_socket(int __fd)
+{
+	for (int i = 0; i < master_socket_list.size(); ++i)
+	{
+		if (fd == master_socket_list[i])
+		{
+			master_socket = __fd;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void Socket::setup_multiple_interface(std::map<std::string, std::string> interface_list)
+{
+	for (std::map<std::string, std::string>::iterator it = interface_list.begin(); it != interface_list.end(); ++it)
+	{
+		int test;
+		test = this->init_socket(atoi(it->first.c_str()), it->second);	
+		this->set_nonblocking(test);
+		this->init_poll(test);
+	}
+}
+
+
 void Socket::start()
 {
+	// init master socket 1
+	// int test;
+	// test = this->init_socket(80, "0.0.0.0");
+	// this->set_nonblocking(test);
+	// this->init_poll(test);
+
+	// // init master socket 2
+	// test = this->init_socket(8080, "0.0.0.0");
+	// this->set_nonblocking(test);
+	// this->init_poll(test);
+
+	setup_multiple_interface(__interface_list);
+
 	for (;;)
 	{
 		// using poll instead of epoll
@@ -165,7 +199,7 @@ void Socket::start()
 				fd = fds[i].fd;
 				if (fds[i].revents & POLLIN)
 				{
-					if (fd == master_socket)
+					if (is_master_socket(fd))
 					{
 						set_incoming_connection();
 						continue;

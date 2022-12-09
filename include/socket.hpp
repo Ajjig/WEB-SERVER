@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
+#include <vector>
 # include <fstream>
 #include <sys/socket.h>
 #include <sys/wait.h>
@@ -21,6 +21,8 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <map>
+
 
 #define MAX_EVENTS 10
 #define MAX_FD 200
@@ -42,22 +44,23 @@ class Socket
         std::string read_file(char *filename);
         int _port;
         std::string _host;
+        std::vector<int> master_socket_list;
+        std::map<std::string, std::string> __interface_list;
 
     public:
-        Socket();
-        Socket(int port, std::string host);
-        Socket(int port);
+        Socket(std::map<std::string, std::string> interface_list);
         ~Socket();
         int set_nonblocking(int sockfd);
-        int init_socket();
-        void init_poll();
+        int init_socket(int defined_port, std::string defined_host);
+        void init_poll(int defined_master_socket);
 
         void set_incoming_connection();
         void read_fd();
         void write_fd();
         void log_client_info();
         void start();
-
+        int is_master_socket(int fd);
+        void setup_multiple_interface(std::map<std::string, std::string> interface_list);
         int get_port();
         std::string get_host();
         std::string get_http_header();

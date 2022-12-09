@@ -25,6 +25,7 @@
 #include <strings.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <map>
 
 # define METHODS std::string("GET POST PUT DELETE HEAD OPTIONS TRACE CONNECT PATCH")
 
