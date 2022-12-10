@@ -1,4 +1,4 @@
-#include "../include/socket.hpp"
+#include "socket.hpp"
 
 Socket::Socket(std::map<std::string, std::string> interface_list) : nfds(1), REQ_COUNT(0)
 {
@@ -8,9 +8,16 @@ Socket::Socket(std::map<std::string, std::string> interface_list) : nfds(1), REQ
 
 Socket::Socket(Server server) : nfds(1), REQ_COUNT(0)
 {
-	
 	__interface_list.insert(std::pair<std::string,  std::string> (std::to_string(server.getPort()), server.getHost()));
-	
+	memset(fds, 0, sizeof(fds));
+}
+
+Socket::Socket(std::vector<Server> servers) : nfds(1), REQ_COUNT(0), __server_list(servers)
+{
+	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); ++it)
+	{
+		__interface_list.insert(std::pair<std::string,  std::string> (std::to_string(it->getPort()), it->getHost()));
+	}
 	memset(fds, 0, sizeof(fds));
 }
 
@@ -91,6 +98,14 @@ int Socket::current_interface_index(int _master_socket_fd)
 	return -1;
 }
 
+Server Socket::current_server(int _master_socket_fd)
+{
+	int index = current_interface_index(_master_socket_fd);
+	std::vector<Server>::iterator it = __server_list.begin();
+	std::advance(it, index);
+	return *it;
+}
+
 std::string Socket::get_port_from_fd(int _master_socket_fd)
 {
 	int index = current_interface_index(_master_socket_fd);
@@ -165,7 +180,7 @@ int Socket::is_master_socket(int __fd)
 {
 	for (int i = 0; i < master_socket_list.size(); ++i)
 	{
-		if (fd == master_socket_list[i])
+		if (__fd == master_socket_list[i])
 		{
 			master_socket = __fd;
 			return 1;
@@ -264,8 +279,7 @@ std::string Socket::read_file(char *filename)
 }
 
 std::string Socket::construct_response()
-{
-
+{	
 	request req(get_http_header());
 	// acitve logs
 	req.req_logs();
@@ -276,18 +290,7 @@ std::string Socket::construct_response()
 		res.Get();
 
 	std::cout << "\n\n" << res.get_header() << "\n\n";
-	
-	// std::cout << res.get_response() << std::endl;
 
-    // std::string out = read_file((char *)"./html/index.html");
-
-    // int file_size = out.size();
-
-    // std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json; Connection: keep-alive; Content-Transfer-Encoding: binary; Content-Length: " \
-    //    + std::to_string(file_size) + ";\r\n\r\n" + out;
-
-    // std::string response = std::string("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ") \
-    //     + std::string("5") + std::string("\n\n") + std::string("Hello");
 
     return res.get_response();
 }

@@ -50,15 +50,17 @@ class Socket
         std::map<std::string, std::string> __interface_list;
         int current_interface_index(int _master_socket_fd);
         std::string get_port_from_fd(int _master_socket_fd);
+        std::vector<Server> __server_list;
 
     public:
         Socket(std::map<std::string, std::string> interface_list);
+        Socket(std::vector<Server> servers);
         Socket(Server server);
         ~Socket();
         int set_nonblocking(int sockfd);
         int init_socket(int defined_port, std::string defined_host);
         void init_poll(int defined_master_socket);
-
+        Server current_server(int _master_socket_fd);
         void set_incoming_connection();
         void read_fd();
         void write_fd(std::string res);
