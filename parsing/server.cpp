@@ -30,7 +30,9 @@ string Server::getRoot() {
 int Server::getPort() {
 	return _port;
 }
-
+void Server::setport(int port) {
+	this->_port = port;
+}
 std::string Server::getHost() {
 	return _host;
 }

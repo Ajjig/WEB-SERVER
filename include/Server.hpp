@@ -16,6 +16,7 @@ class Server {
 		int getPort();
 		std::string getHost();
 		std::string getName();
+		void setport(int port);
 	private:
 		std::vector<Location> _locations;
 		std::vector<std::string> _locationPaths;

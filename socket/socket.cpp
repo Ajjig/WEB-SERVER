@@ -1,23 +1,14 @@
 #include "socket.hpp"
 
-Socket::Socket(std::map<std::string, std::string> interface_list) : nfds(1), REQ_COUNT(0)
+Socket::Socket(int port, std::string host) : nfds(1), REQ_COUNT(0) ,_port(port), _host(host)
 {
-	__interface_list = interface_list;
 	memset(fds, 0, sizeof(fds));
 }
 
-Socket::Socket(Server server) : nfds(1), REQ_COUNT(0)
-{
-	__interface_list.insert(std::pair<std::string,  std::string> (std::to_string(server.getPort()), server.getHost()));
-	memset(fds, 0, sizeof(fds));
-}
+
 
 Socket::Socket(std::vector<Server> servers) : nfds(1), REQ_COUNT(0), __server_list(servers)
 {
-	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); ++it)
-	{
-		__interface_list.insert(std::pair<std::string,  std::string> (std::to_string(it->getPort()), it->getHost()));
-	}
 	memset(fds, 0, sizeof(fds));
 }
 
@@ -85,7 +76,7 @@ int Socket::set_nonblocking(int sockfd)
 void Socket::log_client_info(int master_socket)
 {
 	REQ_COUNT++;
-	std::cout << "\tNew client on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
+	std::cout << "New request on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
 }
 
 int Socket::current_interface_index(int _master_socket_fd)
@@ -109,9 +100,9 @@ Server Socket::current_server(int _master_socket_fd)
 std::string Socket::get_port_from_fd(int _master_socket_fd)
 {
 	int index = current_interface_index(_master_socket_fd);
-	std::map<std::string, std::string>::iterator it = __interface_list.begin();
+	std::vector<Server>::iterator it = __server_list.begin();
 	std::advance(it, index);
-	return it->first;
+	return std::to_string(it->getPort());
 }
 
 void Socket::set_incoming_connection()
@@ -187,17 +178,18 @@ int Socket::is_master_socket(int __fd)
 	return 0;
 }
 
-void Socket::setup_multiple_interface(std::map<std::string, std::string> interface_list)
+void Socket::setup_multiple_interface(std::vector<Server> interface_list)
 {
-	for (std::map<std::string, std::string>::iterator it = interface_list.begin(); it != interface_list.end(); ++it)
+	for (std::vector<Server>::iterator it = __server_list.begin(); it != __server_list.end(); ++it)
 	{
 		int test;
-		test = this->init_socket(atoi(it->first.c_str()), it->second);	
+		test = this->init_socket(it->getPort(), it->getHost());
 		this->set_nonblocking(test);
 		this->init_poll(test);
+		std::cout << " * Running on http://" << it->getHost() <<  ":" << it->getPort() << "/" << \
+			 " \033[31m(Press CTRL+C to quit)\033[0m" <<  std::endl;
 	}
-
-	std::cout << " * Running on http://" << this->_host <<  ":" << this->_port << " \033[31m(Press CTRL+C to quit)\033[0m" <<  std::endl;
+	
 	std::cout  << " * Restarting with stat" << std::endl;
 	std::cout << " * Debugger is\033[32m active!\033[0m\n" << std::endl;
 }
@@ -205,7 +197,7 @@ void Socket::setup_multiple_interface(std::map<std::string, std::string> interfa
 
 void Socket::start()
 {
-	setup_multiple_interface(__interface_list);
+	setup_multiple_interface(this->__server_list);
 
 	for (;;)
 	{

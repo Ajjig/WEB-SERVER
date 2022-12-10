@@ -47,15 +47,13 @@ class Socket
         int _port;
         std::string _host;
         std::vector<int> master_socket_list;
-        std::map<std::string, std::string> __interface_list;
         int current_interface_index(int _master_socket_fd);
         std::string get_port_from_fd(int _master_socket_fd);
         std::vector<Server> __server_list;
 
     public:
-        Socket(std::map<std::string, std::string> interface_list);
+        Socket(int port, std::string host);
         Socket(std::vector<Server> servers);
-        Socket(Server server);
         ~Socket();
         int set_nonblocking(int sockfd);
         int init_socket(int defined_port, std::string defined_host);
@@ -67,7 +65,7 @@ class Socket
         void log_client_info(int master_socket);
         void start();
         int is_master_socket(int fd);
-        void setup_multiple_interface(std::map<std::string, std::string> interface_list);
+        void setup_multiple_interface(std::vector<Server> interface_list);
         int get_port();
         std::string get_host();
         std::string get_http_header();
