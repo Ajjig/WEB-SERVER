@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 01:15:07 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/10 01:17:13 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,9 @@ void respond::init_body() {
 
     std::string path;
     path = root_path + this->req.get_path();
+
+    // print status code
+    std::cout << "Status code: " << this->get_status_code() << std::endl;
 
     // get file ready and length of body
     std::ifstream file(path);

@@ -1,53 +1,61 @@
 #include "../include/socket.hpp"
 
-Socket::Socket() : nfds(1)
+Socket::Socket(std::map<std::string, std::string> interface_list) : nfds(1), REQ_COUNT(0)
 {
-	master_socket = this->init_socket();
-	this->set_nonblocking(master_socket);
-	this->init_poll();
+	__interface_list = interface_list;
+	memset(fds, 0, sizeof(fds));
 }
 
 Socket::~Socket()
 {
-	// close(epfd);
 	close(master_socket);
 }
 
-int Socket::init_socket()
+int Socket::init_socket(int defined_port, std::string defined_host)
 {
+	_port = defined_port;
+	_host = defined_host;
 	if( (master_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("sockfd\n");
-        exit(1);
-    }
-
-
-	bzero(&local, sizeof(local));
-    local.sin_family = AF_INET;
-    local.sin_addr.s_addr = htonl(INADDR_ANY);;
-    local.sin_port = htons(this->get_port());
-
-	int optval = 1;
-	if (setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
-	{
-		perror("setsockopt");
+		perror("sockfd ");
 		exit(1);
 	}
 
-	if( bind(master_socket, (struct sockaddr *) &local, sizeof(local)) < 0) {
-        perror("bind\n");
+	if( (master_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("sockfd ");
         exit(1);
     }
-    listen(master_socket, MAX_FD);
 
+	bzero(&local, sizeof(local));
+    local.sin_family = AF_INET;
+    local.sin_addr.s_addr = inet_addr((_host.c_str()));
+    local.sin_port = htons(_port);
+	
+	int optval = 1;
+	if (setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
+	{
+		perror("setsockopt ");
+		exit(1);
+	}
+	
+	if( bind(master_socket, (struct sockaddr *) &local, sizeof(local)) < 0) {
+        perror("bind ");
+        exit(1);
+    }
+
+    listen(master_socket, MAX_FD);
 	return master_socket;
 }
 
-void Socket::init_poll()
+void Socket::init_poll(int defined_master_socket)
 {
-	memset(fds, 0, sizeof(fds));
-	fds[0].fd = master_socket;
-	fds[0].events = 0 | POLLIN;
-	// nfds++;
+	static int interface_index = 0;
+
+	
+	fds[interface_index].fd = defined_master_socket;
+	fds[interface_index].events = 0 | POLLIN;
+	interface_index++;
+	nfds = interface_index;
+	master_socket_list.push_back(defined_master_socket);
 }
 
 int Socket::set_nonblocking(int sockfd)
@@ -59,6 +67,30 @@ int Socket::set_nonblocking(int sockfd)
 	return 1;
 }
 
+void Socket::log_client_info(int master_socket)
+{
+	REQ_COUNT++;
+	std::cout << "\tNew client on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
+}
+
+int Socket::current_interface_index(int _master_socket_fd)
+{
+	for (int i = 0; i < master_socket_list.size(); ++i)
+	{
+		if (_master_socket_fd == master_socket_list[i])
+			return i;
+	}
+	return -1;
+}
+
+std::string Socket::get_port_from_fd(int _master_socket_fd)
+{
+	int index = current_interface_index(_master_socket_fd);
+	std::map<std::string, std::string>::iterator it = __interface_list.begin();
+	std::advance(it, index);
+	return it->first;
+}
+
 void Socket::set_incoming_connection()
 {
 	while ((incoming_connection = accept(master_socket,(struct sockaddr *) &remote, &addrlen)) > 0)
@@ -68,7 +100,7 @@ void Socket::set_incoming_connection()
 		fds[nfds].fd = incoming_connection;
 		fds[nfds].events = 0 | POLLIN;
 		nfds++;
-		std::cout << "New connection : " << incoming_connection <<std::endl;
+		log_client_info(master_socket);
 	}
 	if (incoming_connection == -1)
 	{
@@ -93,14 +125,12 @@ void Socket::read_fd()
 	else if (nread == 0)
 	{
 		perror("Client disconnected upexpectedly");
-		// close(fd);
 		fds[i].fd = -1;
 		nfds--;
 	}
 	else
 	{
 		fds[i].events = POLLOUT;
-		std::cout << "Read " << n << " bytes from socket " << fd << std::endl;
 	}
 
 }
@@ -128,8 +158,39 @@ void Socket::write_fd()
 	fds[i].fd = -1;
 }
 
+int Socket::is_master_socket(int __fd)
+{
+	for (int i = 0; i < master_socket_list.size(); ++i)
+	{
+		if (fd == master_socket_list[i])
+		{
+			master_socket = __fd;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void Socket::setup_multiple_interface(std::map<std::string, std::string> interface_list)
+{
+	for (std::map<std::string, std::string>::iterator it = interface_list.begin(); it != interface_list.end(); ++it)
+	{
+		int test;
+		test = this->init_socket(atoi(it->first.c_str()), it->second);	
+		this->set_nonblocking(test);
+		this->init_poll(test);
+	}
+
+	std::cout << " * Running on http://" << this->_host <<  ":" << this->_port << " \033[31m(Press CTRL+C to quit)\033[0m" <<  std::endl;
+	std::cout  << " * Restarting with stat" << std::endl;
+	std::cout << " * Debugger is\033[32m active!\033[0m\n" << std::endl;
+}
+
+
 void Socket::start()
 {
+	setup_multiple_interface(__interface_list);
+
 	for (;;)
 	{
 		// using poll instead of epoll
@@ -149,14 +210,13 @@ void Socket::start()
 				fd = fds[i].fd;
 				if (fds[i].revents & POLLIN)
 				{
-					if (fd == master_socket)
+					if (is_master_socket(fd))
 					{
 						set_incoming_connection();
 						continue;
 					}
 					else
 					{
-						std::cout << "Reading from socket " << fd << std::endl;
 						read_fd();
 					}
 
@@ -172,7 +232,7 @@ void Socket::start()
 
 int Socket::get_port()
 {
-	return PORT; // to be changed later
+	return _port; // to be changed later
 }
 
 // Private methods
@@ -189,7 +249,6 @@ std::string Socket::read_file(char *filename)
     if (not inFile.is_open())
     {
         std::cout << "Error opening file" << std::endl;
-        // exit(1);
     }
     /* A stringstream associates a string object with a stream allowing you
 	to read from the string as if it were a stream (like cin). */

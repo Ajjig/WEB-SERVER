@@ -25,6 +25,7 @@
 #include <strings.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <map>
 
 #include "../srcs/request/req.hpp"
 #include "../srcs/cgi/cgi.hpp"
