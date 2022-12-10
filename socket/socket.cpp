@@ -160,20 +160,18 @@ void Socket::read_fd()
 
 void Socket::write_fd(std::string res)
 {
-	int nwrite, data_size = res.length();
-	n = data_size;
-	while (n > 0) {
-		nwrite = write(fd, res.c_str() + data_size - n, n);
-		if (nwrite < n) {
-			if (nwrite == -1 && errno != EAGAIN) {
-				perror("write error");
-			}
-			break;
-		}
-		n -= nwrite;
+	// send data to client then after all data send close connection
+	int nwrite = 0;
+	int n = 0;
+	while (n < res.length())
+	{
+		nwrite = write(fd, res.c_str() + n, res.length() - n);
+		if (nwrite >= 0)
+			n += nwrite;
 	}
 	close(fd);
-	fds[i].fd = -1;
+	this->fds[i].fd = -1;
+	this->nfds--;
 }
 
 int Socket::is_master_socket(int __fd)
