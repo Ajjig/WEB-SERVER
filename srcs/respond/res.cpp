@@ -6,11 +6,13 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 01:17:13 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/10 01:36:18 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./res.hpp"
+
+#define ROOT_PATH "./html"
 
 bool _is_exist(const std::string& name) {
     bool ret;
@@ -25,7 +27,7 @@ bool _is_exist(const std::string& name) {
 // constructors and destructors
 respond::respond(request &req) {
     this->req = req;
-    if (_is_exist(req.get_path())) {
+    if (_is_exist(ROOT_PATH + req.get_path())) {
         this->status_code = 200;
     } else {
         this->status_code = 404;
@@ -67,10 +69,13 @@ void respond::Get() {
 
 void respond::init_body() {
 
-    std::string root_path = "./html";
-
     std::string path;
-    path = root_path + this->req.get_path();
+
+    //if (this->status_code == 404) {
+    //    path = "./srcs/404/404.html";
+    //} else {
+        path = ROOT_PATH + this->req.get_path();
+    //}
 
     // print status code
     std::cout << "Status code: " << this->get_status_code() << std::endl;

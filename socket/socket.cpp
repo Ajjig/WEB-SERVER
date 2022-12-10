@@ -264,9 +264,12 @@ std::string Socket::construct_response()
 {
 
 	request req(get_http_header());
+	// acitve logs
 	req.req_logs();
+
 	respond res(req);
-	res.Get();
+	if (req.get_method() == "GET")
+		res.Get();
 
 	//std::cout << res.get_response() << std::endl;
 
