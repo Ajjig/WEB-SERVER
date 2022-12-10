@@ -109,6 +109,7 @@ void Socket::write_fd()
 {
 	std::string response = construct_response();
 
+
 	sprintf(buffer, response.c_str(), response.length());
 
 	int nwrite, data_size = strlen(buffer);
@@ -184,7 +185,7 @@ std::string Socket::read_file(char *filename)
 {
     std::ifstream inFile;
 
-    inFile.open(filename, std::ios::in);
+    inFile.open(filename, std::ios::binary);
     if (not inFile.is_open())
     {
         std::cout << "Error opening file" << std::endl;
@@ -194,19 +195,32 @@ std::string Socket::read_file(char *filename)
 	to read from the string as if it were a stream (like cin). */
     std::stringstream strStream;
     strStream << inFile.rdbuf(); //read the file
+	
+	inFile.close();
 
     return strStream.str();
 }
 
 std::string Socket::construct_response()
 {
-    std::string out = read_file((char *)"./html/index.html");
-    int file_size = out.length();
 
-    std::string response = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " \
-        + std::to_string(file_size) + "\n\n" + out;
+	request req(get_http_header());
+	req.req_logs();
+	respond res(req);
+	res.Get();
+
+	//std::cout << res.get_response() << std::endl;
+
+    //std::string out = read_file((char *)"./html/test.json");
+
+    //int file_size = out.size();
+
+    //std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json; Connection: keep-alive; Content-Transfer-Encoding: binary; Content-Length: " \
+    //    + std::to_string(file_size) + ";\r\n\r\n" + out;
+
+
     // std::string response = std::string("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ") \
     //     + std::string("5") + std::string("\n\n") + std::string("Hello");
 
-    return response ;
+    return res.get_response() ;
 }

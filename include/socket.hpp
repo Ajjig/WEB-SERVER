@@ -18,6 +18,9 @@
 #include <strings.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <vector>
+
+#include "../srcs/respond/res.hpp"
 
 #define MAX_EVENTS 10
 #define PORT 80

@@ -3,7 +3,7 @@ CC = c++
 CPPFLAGS =  -std=c++98
 
 SRCS = main.cpp ${addprefix ./parsing/, location.cpp tokens.cpp server.cpp}
-SRCS += ${addprefix ./socket/, socket.cpp}
+SRCS += ${addprefix ./socket/, socket.cpp} ${addprefix ./srcs/request/, req.cpp} ${addprefix ./srcs/cgi/, cgi.cpp} ${addprefix ./srcs/respond/, res.cpp}
 OBJS = $(SRCS:.cpp=.o)
 INC = ./include/header.hpp
 RM = rm -rf

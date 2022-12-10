@@ -26,6 +26,10 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#include "../srcs/request/req.hpp"
+#include "../srcs/cgi/cgi.hpp"
+
+
 # define METHODS std::string("GET POST PUT DELETE HEAD OPTIONS TRACE CONNECT PATCH")
 
 typedef std::string string;
