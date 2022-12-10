@@ -263,26 +263,25 @@ std::string Socket::read_file(char *filename)
 std::string Socket::construct_response()
 {
 
-	request req(get_http_header());
-	// acitve logs
-	req.req_logs();
+	//request req(get_http_header());
+	//// acitve logs
+	//req.req_logs();
 
-	respond res(req);
-	if (req.get_method() == "GET")
-		res.Get();
-
+	//respond res(req);
+	//if (req.get_method() == "GET")
+	//	res.Get();
 	//std::cout << res.get_response() << std::endl;
+    //return res.get_response() ;
 
-    //std::string out = read_file((char *)"./html/test.json");
+    std::string out = read_file((char *)"./html/index.html");
 
-    //int file_size = out.size();
+    int file_size = out.size();
 
-    //std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json; Connection: keep-alive; Content-Transfer-Encoding: binary; Content-Length: " \
-    //    + std::to_string(file_size) + ";\r\n\r\n" + out;
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html; Connection: keep-alive; Content-Transfer-Encoding: binary; Content-Length: " \
+        + std::to_string(file_size) + ";\r\n\r\n" + out;
 
 
     // std::string response = std::string("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ") \
     //     + std::string("5") + std::string("\n\n") + std::string("Hello");
-
-    return res.get_response() ;
+	return response;
 }

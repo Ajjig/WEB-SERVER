@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 01:36:18 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/10 13:52:47 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,12 @@ std::string respond::get_response() {
 void respond::Get() {
     
     std::string type = this->req.get_type_file();
+    // check the status code if 404 set the type to html
+    if (this->status_code == 404) {
+        type = "html";
+    }
     std::string content_type = this->get_type()[type];
+    
     std::string status_code = this->get_status_code();
     std::string date = this->get_date();
     std::string server = "Webserv/1.0";
@@ -71,11 +76,11 @@ void respond::init_body() {
 
     std::string path;
 
-    //if (this->status_code == 404) {
-    //    path = "./srcs/404/404.html";
-    //} else {
+    if (this->status_code == 404) {
+        path = "./srcs/404/404.html";
+    } else {
         path = ROOT_PATH + this->req.get_path();
-    //}
+    }
 
     // print status code
     std::cout << "Status code: " << this->get_status_code() << std::endl;
