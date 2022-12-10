@@ -137,10 +137,12 @@ void Socket::read_fd()
 
 void Socket::write_fd(std::string res)
 {
-	char buffer[res.length()] = {0};
+	int len = res.length();
+	
+	char buffer[len] = {0};
 	strcpy(buffer, res.c_str());
 
-	int nwrite, data_size = strlen(buffer);
+	int nwrite, data_size = len;
 	n = data_size;
 	while (n > 0) {
 		nwrite = write(fd, buffer + data_size - n, n);
