@@ -27,6 +27,14 @@ string Server::getRoot() {
 	return _root;
 }
 
+int Server::getPort() {
+	return _port;
+}
+
+std::string Server::getHost() {
+	return _host;
+}
+
 std::vector<string> Server::getIndexes() {
 	return _indexes;
 }

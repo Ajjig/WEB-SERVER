@@ -22,8 +22,10 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <map>
+#include <utility>
 
 #include "../srcs/respond/res.hpp"
+#include "../include/header.hpp"
 
 #define MAX_EVENTS 10
 #define MAX_FD 200
@@ -52,6 +54,7 @@ class Socket
 
     public:
         Socket(std::map<std::string, std::string> interface_list);
+        Socket(Server server);
         ~Socket();
         int set_nonblocking(int sockfd);
         int init_socket(int defined_port, std::string defined_host);

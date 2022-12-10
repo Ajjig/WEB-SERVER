@@ -32,6 +32,9 @@ void Location::addIndex(string index) {
 	_indexes.push_back(index);
 }
 
+
+
+
 std::vector<string> Location::getIndexes() {
 	return _indexes;
 }

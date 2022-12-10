@@ -6,6 +6,14 @@ Socket::Socket(std::map<std::string, std::string> interface_list) : nfds(1), REQ
 	memset(fds, 0, sizeof(fds));
 }
 
+Socket::Socket(Server server) : nfds(1), REQ_COUNT(0)
+{
+	
+	__interface_list.insert(std::pair<std::string,  std::string> (std::to_string(server.getPort()), server.getHost()));
+	
+	memset(fds, 0, sizeof(fds));
+}
+
 Socket::~Socket()
 {
 	close(master_socket);
@@ -138,8 +146,8 @@ void Socket::read_fd()
 void Socket::write_fd(std::string res)
 {
 	int len = res.length();
-	
-	char buffer[len] = {0};
+
+	buffer[len];
 	strcpy(buffer, res.c_str());
 
 	int nwrite, data_size = len;

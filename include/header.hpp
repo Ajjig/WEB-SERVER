@@ -11,6 +11,7 @@
 # include "socket.hpp"
 # include <stack>
 #include <iostream>
+#include <utility>
 
 #include <sstream>
 #include <sys/socket.h>
@@ -26,7 +27,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <map>
-
+#include <algorithm>
 #include "../srcs/request/req.hpp"
 #include "../srcs/cgi/cgi.hpp"
 

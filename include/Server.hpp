@@ -13,6 +13,8 @@ class Server {
 		std::vector<std::string> getIndexes();
 		std::vector<Location> getLocations();
 		void put();
+		int getPort();
+		std::string getHost();
 	private:
 		std::vector<Location> _locations;
 		std::vector<std::string> _locationPaths;
