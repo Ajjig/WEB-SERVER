@@ -43,6 +43,10 @@ std::vector<Location> Server::getLocations() {
 	return _locations;
 }
 
+std::string Server::getName() {
+	return _name;
+}
+
 void Server::parse(std::vector<string> config) {
 
 	int bracket = 0;
