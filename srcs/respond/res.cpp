@@ -6,13 +6,11 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 13:52:47 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/10 17:53:34 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./res.hpp"
-
-#define ROOT_PATH "./html"
 
 bool _is_exist(const std::string& name) {
     bool ret;
@@ -40,6 +38,14 @@ std::string respond::get_status_code() {
     return std::to_string(this->status_code);
 }
 
+std::string respond::get_header() {
+    return this->header;
+}
+
+std::string respond::get_body() {
+    return this->body;
+}
+
 // methods
 
 std::string respond::get_response() {
@@ -61,7 +67,7 @@ void respond::Get() {
     std::string content_length = std::to_string(this->content_length);
     std::string connection = req.get_headers()["Connection"];
     
-    std::string header = this->req.get_http_version() + " " + status_code + " " + this->status_msg()[std::string(status_code)] + "\r\n";
+    std::string header = "HTTP/1.1 " + status_code + " " + this->status_msg()[std::string(status_code)] + "\r\n";
     header += "Date: " + date + "\r\n";
     header += "Server: " + server + "\r\n";
     header += "Content-Type: " + content_type + "\r\n";
@@ -82,17 +88,61 @@ void respond::init_body() {
         path = ROOT_PATH + this->req.get_path();
     }
 
-    // print status code
-    std::cout << "Status code: " << this->get_status_code() << std::endl;
+// method using fopen and fread and ftell and rewind
+    //const char* file_name = path.c_str();
 
-    // get file ready and length of body
-    std::ifstream file(path);
-    std::string line;
-    while (std::getline(file, line)) {
-        this->body += line;
+    //FILE* file_stream = fopen(file_name, "rb");
+    //string file_str;
+    //size_t file_size;
+
+    //if(file_stream != nullptr)
+    //{
+    //    fseek(file_stream, 0, SEEK_END);
+    //    long file_length = ftell(file_stream);
+    //    rewind(file_stream);
+        
+    //    char* buffer = new char[file_length];
+    //    file_size = fread(buffer, 1, file_length, file_stream);
+    //    file_str = string(buffer, file_size);
+    //    delete[] buffer;
+    //}
+    //fclose(file_stream);
+    
+    //this->body = file_str;
+    //this->content_length = file_size;
+
+    // trunsfer code up from using string to using vector
+    const char* file_name = path.c_str();
+    
+    FILE* file_stream = fopen(file_name, "rb");
+    std::vector<char> file_vec;
+    size_t file_size;
+    
+    if(file_stream != nullptr)
+    {
+        fseek(file_stream, 0, SEEK_END);
+        long file_length = ftell(file_stream);
+        rewind(file_stream);
+        
+        char* buffer = new char[file_length];
+        file_size = fread(buffer, 1, file_length, file_stream);
+        file_vec = std::vector<char>(buffer, buffer + file_size);
+        delete[] buffer;
     }
-    file.close();
-    this->content_length = this->body.length();
+    fclose(file_stream);
+    
+    // assing victor to body vector
+    this->body = std::string(file_vec.begin(), file_vec.end());
+    this->content_length = file_size;
+    
+
+
+
+// method using ifstream and vector
+    //std::ifstream file(path, std::ios::binary);
+    //std::vector<char> buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    //this->body = std::string(buffer.begin(), buffer.end());
+    //this->content_length = buffer.size();
 }
 
 
@@ -143,6 +193,7 @@ std::map<std::string, std::string> respond::get_type()
 	types["mid"]      = "audio/midi";
 	types["oga"]      = "audio/ogg";
 	types["ogv"]      = "video/ogg";
+	types["mp4"]      = "video/mp4";
 	types["ogx"]      = "application/ogg";
 	types["png"]      = "image/png";
 	types["pdf"]      = "application/pdf";

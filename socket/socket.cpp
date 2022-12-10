@@ -145,14 +145,10 @@ void Socket::read_fd()
 
 void Socket::write_fd(std::string res)
 {
-	int len = res.length();
-
-	const char *buffer = res.c_str();
-
-	int nwrite, data_size = len;
+	int nwrite, data_size = res.length();
 	n = data_size;
 	while (n > 0) {
-		nwrite = write(fd, buffer + data_size - n, n);
+		nwrite = write(fd, res.c_str() + data_size - n, n);
 		if (nwrite < n) {
 			if (nwrite == -1 && errno != EAGAIN) {
 				perror("write error");
@@ -275,9 +271,12 @@ std::string Socket::construct_response()
 	req.req_logs();
 
 	respond res(req);
+
 	if (req.get_method() == "GET")
 		res.Get();
 
+	std::cout << "\n\n" << res.get_header() << "\n\n";
+	
 	// std::cout << res.get_response() << std::endl;
 
     // std::string out = read_file((char *)"./html/index.html");

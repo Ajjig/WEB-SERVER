@@ -6,12 +6,14 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:04:01 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 01:06:24 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/10 17:53:28 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RES_HPP
 #define RES_HPP
+
+#define ROOT_PATH "./html"
 
 #include "../request/req.hpp"
 #include "../../include/header.hpp"
@@ -39,6 +41,8 @@
             std::string get_date();
             std::map<std::string, std::string> get_type();
             std::map<std::string, std::string> status_msg();
+            std::string get_header();
+            std::string get_body();
 
             // the response
             std::string get_response();
