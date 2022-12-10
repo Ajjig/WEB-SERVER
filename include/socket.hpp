@@ -59,7 +59,7 @@ class Socket
 
         void set_incoming_connection();
         void read_fd();
-        void write_fd();
+        void write_fd(std::string res);
         void log_client_info(int master_socket);
         void start();
         int is_master_socket(int fd);

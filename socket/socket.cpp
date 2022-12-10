@@ -135,12 +135,10 @@ void Socket::read_fd()
 
 }
 
-void Socket::write_fd()
+void Socket::write_fd(std::string res)
 {
-	std::string response = construct_response();
-
-
-	sprintf(buffer, response.c_str(), response.length());
+	char buffer[res.length()] = {0};
+	strcpy(buffer, res.c_str());
 
 	int nwrite, data_size = strlen(buffer);
 	n = data_size;
@@ -223,7 +221,7 @@ void Socket::start()
 				}
 				else if (fds[i].revents & POLLOUT)
 				{
-					write_fd();
+					write_fd(construct_response());
 				}
 			}
 		}
@@ -271,18 +269,17 @@ std::string Socket::construct_response()
 	if (req.get_method() == "GET")
 		res.Get();
 
-	//std::cout << res.get_response() << std::endl;
+	// std::cout << res.get_response() << std::endl;
 
-    //std::string out = read_file((char *)"./html/test.json");
+    // std::string out = read_file((char *)"./html/index.html");
 
-    //int file_size = out.size();
+    // int file_size = out.size();
 
-    //std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json; Connection: keep-alive; Content-Transfer-Encoding: binary; Content-Length: " \
+    // std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json; Connection: keep-alive; Content-Transfer-Encoding: binary; Content-Length: " \
     //    + std::to_string(file_size) + ";\r\n\r\n" + out;
-
 
     // std::string response = std::string("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ") \
     //     + std::string("5") + std::string("\n\n") + std::string("Hello");
 
-    return res.get_response() ;
+    return res.get_response();
 }
