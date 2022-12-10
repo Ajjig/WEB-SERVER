@@ -147,8 +147,7 @@ void Socket::write_fd(std::string res)
 {
 	int len = res.length();
 
-	buffer[len];
-	strcpy(buffer, res.c_str());
+	const char *buffer = res.c_str();
 
 	int nwrite, data_size = len;
 	n = data_size;
