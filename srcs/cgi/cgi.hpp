@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 12:08:04 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/09 19:02:26 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/11 20:27:16 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,10 @@
 # include "../../include/header.hpp"
 
     class cgi {
+        private:
+            Request *req;
         public:
-            cgi(request *req);
+            cgi(Request *req);
     };
 
 #endif

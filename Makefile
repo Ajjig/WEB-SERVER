@@ -1,9 +1,14 @@
 NAME = webserv
 CC = c++
-CPPFLAGS =  -std=c++98
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 
 SRCS = main.cpp ${addprefix ./parsing/, location.cpp tokens.cpp server.cpp}
-SRCS += ${addprefix ./socket/, socket.cpp} ${addprefix ./srcs/request/, req.cpp} ${addprefix ./srcs/cgi/, cgi.cpp} ${addprefix ./srcs/respond/, res.cpp}
+SRCS += ${addprefix ./socket/, socket.cpp} \
+		${addprefix ./srcs/request/, req.cpp} \
+		${addprefix ./srcs/cgi/, cgi.cpp} \
+		${addprefix ./srcs/respond/, res.cpp} \
+		${addprefix ./srcs/dirent/, dir.cpp}
+
 OBJS = $(SRCS:.cpp=.o)
 INC = ./include/header.hpp
 RM = rm -rf

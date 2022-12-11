@@ -81,7 +81,7 @@ void Socket::log_client_info(int master_socket)
 
 int Socket::current_interface_index(int _master_socket_fd)
 {
-	for (int i = 0; i < master_socket_list.size(); ++i)
+	for (int i = 0; i < (int )master_socket_list.size(); ++i)
 	{
 		if (_master_socket_fd == master_socket_list[i])
 			return i;
@@ -172,7 +172,7 @@ void Socket::write_fd(std::string res)
 
 int Socket::is_master_socket(int __fd)
 {
-	for (int i = 0; i < master_socket_list.size(); ++i)
+	for (int i = 0; i < (int )master_socket_list.size(); ++i)
 	{
 		if (__fd == master_socket_list[i])
 		{
@@ -185,6 +185,7 @@ int Socket::is_master_socket(int __fd)
 
 void Socket::setup_multiple_interface(std::vector<Server> interface_list)
 {
+	(void )interface_list;
 	for (std::vector<Server>::iterator it = __server_list.begin(); it != __server_list.end(); ++it)
 	{
 		int test;
@@ -273,11 +274,11 @@ std::string Socket::read_file(char *filename)
 
 std::string Socket::construct_response()
 {	
-	request req(get_http_header());
+	Request req(get_http_header());
 	// acitve logs
 	req.req_logs();
 
-	respond res(req);
+	Respond res(req);
 
 	if (req.get_method() == "GET")
 		res.Get();

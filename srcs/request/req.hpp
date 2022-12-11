@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:02:05 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 00:36:00 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/11 22:34:10 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <unistd.h>
 # include <string>
 
-class request {
+class Request {
     private:
         std::string                         method;
         std::string                         uri;
@@ -37,9 +37,9 @@ class request {
 
     public:
         // constructors and destructors
-        request() {};
-        request(std::string request);
-        ~request(){}
+        Request() {};
+        Request(std::string request);
+        ~Request(){}
         
         // setters and getters
         std::map<std::string, std::string>  get_headers(void);
@@ -54,6 +54,7 @@ class request {
         void                                req_logs(void);
         std::string                         get_type_file(void);
         std::string                         get_file_name(void);
+        void                                set_path(std::string path);
 };
 
 

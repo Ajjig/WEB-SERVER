@@ -6,13 +6,14 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:35:37 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/09 15:38:00 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/11 20:26:53 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cgi.hpp"
 
-cgi::cgi(request *req)
+cgi::cgi(Request *req)
 {
+    this->req = req;
     std::cout << "CGI" << std::endl;
 }
