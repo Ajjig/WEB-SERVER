@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:02:05 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 00:16:14 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/12 00:28:09 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,7 @@ class Request {
         // constructors and destructors
         Request() {};
         Request(std::string request);
-        Request(std::string request, Server server) {
-            this->parse_request(request);
-            (void )server;
-        };
+        Request(std::string request, Server server);
         ~Request(){}
         
         // setters and getters
