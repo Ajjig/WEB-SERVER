@@ -88,23 +88,27 @@ int Socket::current_interface_index(int _master_socket_fd)
 	return -1;
 }
 
+bool is_in_vector(std::vector<std::string> vec, std::string val)
+{
+	for (int i = 0; i < vec.size(); ++i)
+	{
+		// remove whitespace 
+		val.erase(std::remove(val.begin(), val.end(), ' '), val.end());
+		if (vec[i] == val)
+			return true;
+	}
+	return false;
+}
+
 Server Socket::current_server(int _master_socket_fd, std::string server_name)
 {
 	for (int i = 0; i < __server_list.size(); ++i)
 	{
 		if (this->get_port_from_fd(_master_socket_fd) == std::to_string(__server_list[i].getPort()) \
-			&& __server_list[i].getName() == server_name)
+			&& is_in_vector(__server_list[i].getNames(), server_name))
 		{
-			std::cout << "Server name : " << __server_list[i].getName() << std::endl;
 			return __server_list[i];
 		}
-		// {
-			// for (int j = i; j < __server_list.size(); ++j)
-			// {
-			// 	if (__server_list[j].getName() == server_name)
-			// 		return __server_list[j];
-			// }
-		// }
 	}
 
 	/*
@@ -274,7 +278,7 @@ int Socket::get_port()
 // Private methods
 std::string Socket::parse_server_name(std::string header)
 {
-	std::string tmp = header.find("server_name: ") != std::string::npos ? header.substr(header.find("servername: ") + 12) : "";
+	std::string tmp = header.find("server_name: ") != std::string::npos ? header.substr(header.find("server_name: ") + 12) : "";
 	return tmp.substr(0, tmp.find("\r\n"));
 }
 
@@ -304,7 +308,8 @@ std::string Socket::read_file(char *filename)
 
 std::string Socket::construct_response()
 {
-	std::cout << "requested object  : " << current_server(master_socket, parse_server_name(get_http_header())).getName() << std::endl;
+	std::string test = current_server(master_socket, parse_server_name(get_http_header())).getName();
+	std::cout << "requested object  : " << test << std::endl;
 	
 	request req(get_http_header());
 	// acitve logs
