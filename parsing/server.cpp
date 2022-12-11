@@ -2,11 +2,19 @@
 
 
 Server::Server( std::vector<string> & config, size_t & i ) {
-	_name = "webserv";
-	_port = 80;
+	_name = "webserv.com";
+	_port = -1;
 	_root = "./";
 	_host = "None";
 	parse(config, i);
+}
+
+bool Server::isBind() {
+	return _bind;
+}
+
+void Server::setBind(bool val) {
+	_bind = val;
 }
 
 Server::~Server() {}
@@ -52,9 +60,10 @@ std::string Server::getName() {
 void Server::parse(std::vector<string> & config, size_t & i) {
 
 	int		bracket	= 0;
-	size_t	tmp = i;
+	size_t	tmp = i - 1;
 	bool	multiplePorts = false;
-	for (size_t i = 0; i < config.size(); i++) {
+	i +=2 ;
+	for ( ; i < config.size(); i++) {
 		if (config[i] == "index")
 			while (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
 				addIndex(config[i + 1]);
@@ -72,7 +81,6 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 				std::cout << "Error: port must be followed by a number" << std::endl;
 				exit(EXIT_FAILURE);
 			} else {
-
 				_port = std::atoi(config[i].c_str());
 				if (std::atoi(config[i + 1].c_str()) != 0) {
 					multiplePorts = true;
@@ -110,12 +118,12 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 		if (bracket == -1)
 			break;
 	}
-	if (_port < 0 || _port > 65535) {
-		std::cout << "Error: port must be 0 < p <= 65535" << std::endl;
+	if (_port <= 0 || _port > 65535) {
+		std::cout << "Error: port must be 0 <= p <= 65535" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	if (multiplePorts)
-		i = tmp - 1;
+		i = tmp;
 }
 
 void Server::put( void ) {

@@ -35,14 +35,14 @@ int Socket::init_socket(int defined_port, std::string defined_host)
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = inet_addr((_host.c_str()));
     local.sin_port = htons(_port);
-	
+
 	int optval = 1;
 	if (setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
 	{
 		perror("setsockopt ");
 		exit(1);
 	}
-	
+
 	if( bind(master_socket, (struct sockaddr *) &local, sizeof(local)) < 0) {
         perror("bind ");
         exit(1);
@@ -56,7 +56,7 @@ void Socket::init_poll(int defined_master_socket)
 {
 	static int interface_index = 0;
 
-	
+
 	fds[interface_index].fd = defined_master_socket;
 	fds[interface_index].events = 0 | POLLIN;
 	interface_index++;
@@ -188,13 +188,19 @@ void Socket::setup_multiple_interface(std::vector<Server> interface_list)
 	for (std::vector<Server>::iterator it = __server_list.begin(); it != __server_list.end(); ++it)
 	{
 		int test;
-		test = this->init_socket(it->getPort(), it->getHost());
-		this->set_nonblocking(test);
-		this->init_poll(test);
-		std::cout << " * Running on http://" << it->getHost() <<  ":" << it->getPort() << "/" << \
+
+		if (it->isBind() == true)
+		{
+			test = this->init_socket(it->getPort(), it->getHost());
+			this->set_nonblocking(test);
+			this->init_poll(test);
+		}
+
+		std::cout << " * Running on http://" << it->getHost() <<  ":" << it->getPort() << "/"\
+			<< "under servername  : " << it->getName() <<  \
 			 " \033[31m(Press CTRL+C to quit)\033[0m" <<  std::endl;
 	}
-	
+
 	std::cout  << " * Restarting with stat" << std::endl;
 	std::cout << " * Debugger is\033[32m active!\033[0m\n" << std::endl;
 }
@@ -265,14 +271,14 @@ std::string Socket::read_file(char *filename)
 	to read from the string as if it were a stream (like cin). */
     std::stringstream strStream;
     strStream << inFile.rdbuf(); //read the file
-	
+
 	inFile.close();
 
     return strStream.str();
 }
 
 std::string Socket::construct_response()
-{	
+{
 	request req(get_http_header());
 	// acitve logs
 	req.req_logs();
