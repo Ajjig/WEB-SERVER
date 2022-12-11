@@ -4,7 +4,7 @@
 
 class Server {
 	public:
-		Server( std::vector<std::string> config );
+		Server( std::vector<std::string> & config, size_t & i );
 		~Server();
 		void addLocation(Location location);
 		void addIndex(std::string ind);
@@ -21,7 +21,7 @@ class Server {
 		std::vector<Location> _locations;
 		std::vector<std::string> _locationPaths;
 
-		void parse(std::vector<std::string> config);
+		void parse(std::vector<std::string> & config, size_t & i);
 		std::string _root;
 		std::string _name;
 		std::string _host;

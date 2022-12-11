@@ -1,12 +1,12 @@
 #include "../include/header.hpp"
 
 
-Server::Server( std::vector<string> config ) {
+Server::Server( std::vector<string> & config, size_t & i ) {
 	_name = "webserv";
 	_port = 80;
 	_root = "./";
 	_host = "None";
-	parse(config);
+	parse(config, i);
 }
 
 Server::~Server() {}
@@ -49,10 +49,11 @@ std::string Server::getName() {
 	return _name;
 }
 
-void Server::parse(std::vector<string> config) {
+void Server::parse(std::vector<string> & config, size_t & i) {
 
-	int bracket = 0;
-
+	int		bracket	= 0;
+	size_t	tmp = i;
+	bool	multiplePorts = false;
 	for (size_t i = 0; i < config.size(); i++) {
 		if (config[i] == "index")
 			while (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
@@ -66,14 +67,16 @@ void Server::parse(std::vector<string> config) {
 			}
 		}
 		else if (config[i] == "listen") {
-			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
+			while (config[++i] == "");
+			if (i >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
 				std::cout << "Error: port must be followed by a number" << std::endl;
 				exit(EXIT_FAILURE);
 			} else {
-				_port = std::stoi(config[i + 1]);
-				if (_port < 0 || _port > 65535) {
-					std::cout << "Error: port must be 0 < p <= 65535" << std::endl;
-					exit(EXIT_FAILURE);
+
+				_port = std::atoi(config[i].c_str());
+				if (std::atoi(config[i + 1].c_str()) != 0) {
+					multiplePorts = true;
+					config[i] = "";
 				}
 			}
 		}
@@ -107,6 +110,12 @@ void Server::parse(std::vector<string> config) {
 		if (bracket == -1)
 			break;
 	}
+	if (_port < 0 || _port > 65535) {
+		std::cout << "Error: port must be 0 < p <= 65535" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if (multiplePorts)
+		i = tmp - 1;
 }
 
 void Server::put( void ) {
@@ -127,7 +136,6 @@ void Server::put( void ) {
 		std::cout << "Allowed methods :" << std::endl << "   ";
 		for (size_t j = 0; j < _locations[i].getAllowed().size(); j++)
 			std::cout << _locations[i].getAllowed()[j] << ", ";
-		std::cout << std::endl;
 		std::cout << std::endl;
 	}
 }
