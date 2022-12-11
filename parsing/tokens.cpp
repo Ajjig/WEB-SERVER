@@ -38,6 +38,15 @@ void validate(std::vector<string> & config) {
 	}
 }
 
+void	bind_checker(std::vector<Server> & servers, Server & s) {
+	for (size_t i = 0; i < servers.size(); i++) {
+		if (servers[i].getHost() == s.getHost() && servers[i].getPort() == s.getPort()) {
+			s.setBind(false);
+			return ;
+		}
+	}
+	s.setBind(true);
+}
 
 std::vector<Server> parse( int ac, char ** av ) {
 
@@ -68,7 +77,9 @@ std::vector<Server> parse( int ac, char ** av ) {
 
 	for (size_t i = 0; i < config.size(); i++) {
 		if (config[i] == "server") {
-			servers.push_back(Server(config, i));
+			Server s(config, i);
+			bind_checker(servers, s);
+			servers.push_back(s);
 		}
 	}
 	return servers;

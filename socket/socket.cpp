@@ -35,14 +35,14 @@ int Socket::init_socket(int defined_port, std::string defined_host)
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = inet_addr((_host.c_str()));
     local.sin_port = htons(_port);
-	
+
 	int optval = 1;
 	if (setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
 	{
 		perror("setsockopt ");
 		exit(1);
 	}
-	
+
 	if( bind(master_socket, (struct sockaddr *) &local, sizeof(local)) < 0) {
         perror("bind ");
         exit(1);
@@ -56,7 +56,7 @@ void Socket::init_poll(int defined_master_socket)
 {
 	static int interface_index = 0;
 
-	
+
 	fds[interface_index].fd = defined_master_socket;
 	fds[interface_index].events = 0 | POLLIN;
 	interface_index++;
@@ -75,7 +75,6 @@ int Socket::set_nonblocking(int sockfd)
 
 void Socket::log_client_info(int master_socket)
 {
-	REQ_COUNT++;
 	std::cout << "New request on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
 }
 
@@ -89,13 +88,37 @@ int Socket::current_interface_index(int _master_socket_fd)
 	return -1;
 }
 
-Server Socket::current_server(int _master_socket_fd)
+bool is_in_vector(std::vector<std::string> vec, std::string val)
 {
-	int index = current_interface_index(_master_socket_fd);
-	std::vector<Server>::iterator it = __server_list.begin();
-	std::advance(it, index);
-	return *it;
+	for (int i = 0; i < vec.size(); ++i)
+	{
+		// remove whitespace 
+		val.erase(std::remove(val.begin(), val.end(), ' '), val.end());
+		if (vec[i] == val)
+			return true;
+	}
+	return false;
 }
+
+Server Socket::current_server(int _master_socket_fd, std::string server_name)
+{
+	for (int i = 0; i < __server_list.size(); ++i)
+	{
+		if (this->get_port_from_fd(_master_socket_fd) == std::to_string(__server_list[i].getPort()) \
+			&& is_in_vector(__server_list[i].getNames(), server_name))
+		{
+			return __server_list[i];
+		}
+	}
+
+	/*
+		the default server should handle the request if 
+		all the requests that don’t belong to an other server.
+	*/ 
+	return __server_list[0];
+}
+
+
 
 std::string Socket::get_port_from_fd(int _master_socket_fd)
 {
@@ -188,14 +211,20 @@ void Socket::setup_multiple_interface(std::vector<Server> interface_list)
 	(void )interface_list;
 	for (std::vector<Server>::iterator it = __server_list.begin(); it != __server_list.end(); ++it)
 	{
-		int test;
-		test = this->init_socket(it->getPort(), it->getHost());
-		this->set_nonblocking(test);
-		this->init_poll(test);
-		std::cout << " * Running on http://" << it->getHost() <<  ":" << it->getPort() << "/" << \
+		int socket_id;
+
+		if (it->isBind() == true)
+		{
+			socket_id = this->init_socket(it->getPort(), it->getHost());
+			this->set_nonblocking(socket_id);
+			this->init_poll(socket_id);
+		}
+
+		std::cout << " * Running on http://" << it->getHost() <<  ":\033[34m" << it->getPort() << "\033[0m/ "\
+			<< "\tServer Name:\033[32m " << (it->getName() != "" ? it->getName() : "Not Defined") <<  \
 			 " \033[31m(Press CTRL+C to quit)\033[0m" <<  std::endl;
 	}
-	
+
 	std::cout  << " * Restarting with stat" << std::endl;
 	std::cout << " * Debugger is\033[32m active!\033[0m\n" << std::endl;
 }
@@ -248,6 +277,12 @@ int Socket::get_port()
 }
 
 // Private methods
+std::string Socket::parse_server_name(std::string header)
+{
+	std::string tmp = header.find("server_name: ") != std::string::npos ? header.substr(header.find("server_name: ") + 12) : "";
+	return tmp.substr(0, tmp.find("\r\n"));
+}
+
 std::string Socket::get_http_header()
 {
 	return std::string(http_header);
@@ -266,15 +301,23 @@ std::string Socket::read_file(char *filename)
 	to read from the string as if it were a stream (like cin). */
     std::stringstream strStream;
     strStream << inFile.rdbuf(); //read the file
-	
+
 	inFile.close();
 
     return strStream.str();
 }
 
 std::string Socket::construct_response()
+<<<<<<< HEAD
 {	
 	Request req(get_http_header());
+=======
+{
+	std::string test = current_server(master_socket, parse_server_name(get_http_header())).getName();
+	std::cout << "requested object  : " << test << std::endl;
+	
+	request req(get_http_header());
+>>>>>>> 3f85c431e39bc8129fd1081cb72616980054559c
 	// acitve logs
 	req.req_logs();
 

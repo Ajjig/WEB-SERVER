@@ -12,18 +12,24 @@ class Server {
 		std::string getRoot();
 		std::vector<std::string> getIndexes();
 		std::vector<Location> getLocations();
+		void addName(std::string name);
+		std::vector<std::string> getNames();
 		void put();
 		int getPort();
 		std::string getHost();
 		std::string getName();
+		bool isBind();
+		void setBind(bool val);
 		void setport(int port);
+
 	private:
+
 		std::vector<Location> _locations;
 		std::vector<std::string> _locationPaths;
-
+		bool _bind;
 		void parse(std::vector<std::string> & config, size_t & i);
 		std::string _root;
-		std::string _name;
+		std::vector<std::string> _names;
 		std::string _host;
 		int _port;
 		std::vector<std::string> _indexes;
