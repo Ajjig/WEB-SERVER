@@ -15,8 +15,8 @@ int main( int ac, char ** av ) {
 
 	//put_config(servers); /* printing config */
 
-	//Socket socket(servers);
-	//socket.start();
+	Socket socket(servers);
+	socket.start();
 
 	return 0;
 }
