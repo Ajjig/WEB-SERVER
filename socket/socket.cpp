@@ -308,16 +308,11 @@ std::string Socket::read_file(char *filename)
 }
 
 std::string Socket::construct_response()
-<<<<<<< HEAD
-{	
-	Request req(get_http_header());
-=======
 {
 	std::string test = current_server(master_socket, parse_server_name(get_http_header())).getName();
 	std::cout << "requested object  : " << test << std::endl;
 	
 	request req(get_http_header());
->>>>>>> 3f85c431e39bc8129fd1081cb72616980054559c
 	// acitve logs
 	req.req_logs();
 
