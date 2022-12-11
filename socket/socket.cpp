@@ -151,22 +151,23 @@ void Socket::read_fd()
 
 void Socket::write_fd(std::string res)
 {
-	// send data to client then after all data send close connection
-	int nwrite, data_size = res.length();
+	int len = res.length();
+
+	const char *buffer = res.c_str();
+
+	int nwrite, data_size = len;
 	n = data_size;
 	while (n > 0) {
-		nwrite = write(fd, res.c_str() + data_size - n, n);
+		nwrite = write(fd, buffer + data_size - n, n);
 		if (nwrite < n) {
 			if (nwrite == -1 && errno != EAGAIN) {
 				perror("write error");
 			}
 		}
-		if (nwrite >= 0)
-			n -= nwrite;
+		n -= nwrite;
 	}
 	close(fd);
 	fds[i].fd = -1;
-	nfds--;
 }
 
 int Socket::is_master_socket(int __fd)
@@ -215,8 +216,6 @@ void Socket::start()
 		else if (ret > 0)
 		{
 			N_Files_discriptors = nfds;
-
-
 			for (i = 0; i < N_Files_discriptors; ++i)
 			{
 				fd = fds[i].fd;
