@@ -39,12 +39,14 @@ void validate(std::vector<string> & config) {
 }
 
 
-Server parse( int ac, char ** av ) {
+std::vector<Server> parse( int ac, char ** av ) {
 
 	std::fstream		file;
-	string					buff;
-	string					line;
+	string				buff;
+	string				line;
 	std::vector<string>	config;
+	std::vector<Server>	servers;
+
 
 	if (ac == 1)
 		file.open("./webserv.conf", std::ios::in);
@@ -63,6 +65,12 @@ Server parse( int ac, char ** av ) {
 		std::cout << "Error: invalid config ( missing 'server' )" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	return Server(config);
+
+	for (size_t i = 0; i < config.size(); i++) {
+		if (config[i] == "server") {
+			servers.push_back(Server(config, i));
+		}
+	}
+	return servers;
 }
 
