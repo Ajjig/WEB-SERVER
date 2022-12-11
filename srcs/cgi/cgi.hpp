@@ -6,17 +6,12 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 12:08:04 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/11 20:27:16 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/12 00:17:02 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CGI_HPP
-# define CGI_HPP
+#pragma once
 
-# include <string>
-# include <vector>
-# include <map>
-# include <iostream>
 # include "../../include/header.hpp"
 
     class cgi {
@@ -25,5 +20,3 @@
         public:
             cgi(Request *req);
     };
-
-#endif

@@ -6,18 +6,15 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:04:01 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/11 23:21:23 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/12 00:16:29 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef RES_HPP
-#define RES_HPP
+#pragma once
 
 #define ROOT_PATH "./html"
 
-#include "../request/req.hpp"
 #include "../../include/header.hpp"
-#include "../dirent/dir.hpp"
 
     typedef struct file {
         std::string str;
@@ -59,6 +56,3 @@
             // the response
             std::string get_response();
         };
-    
-
-#endif

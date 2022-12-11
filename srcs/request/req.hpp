@@ -6,22 +6,13 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:02:05 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/11 22:34:10 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/12 00:16:14 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REQUEST_HPP
-# define REQUEST_HPP
+#pragma once
 
-# include <string>
-# include <map>
-# include <vector>
-# include <sstream>
-# include <iostream>
-# include <fstream>
-# include <sys/stat.h>
-# include <unistd.h>
-# include <string>
+#include "../../include/header.hpp"
 
 class Request {
     private:
@@ -39,6 +30,10 @@ class Request {
         // constructors and destructors
         Request() {};
         Request(std::string request);
+        Request(std::string request, Server &server) {
+            this->parse_request(request);
+            (void )server;
+        };
         ~Request(){}
         
         // setters and getters
@@ -71,5 +66,3 @@ class Request {
 //Sec-Fetch-Dest:    image
 //Sec-Fetch-Mode:    no-cors
 //Sec-Fetch-Site:    same-origin
-
-#endif

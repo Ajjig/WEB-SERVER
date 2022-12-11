@@ -1,30 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-# include <fstream>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <poll.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <map>
-#include <utility>
-
-#include "../srcs/respond/res.hpp"
 #include "../include/header.hpp"
 
 #define MAX_EVENTS 10

@@ -1,19 +1,22 @@
-#ifndef __WEB_SERVER_HPP__
-# define __WEB_SERVER_HPP__
+#pragma once
 
-# include <iostream>
 # include <fstream>
-# include <string>
-# include <vector>
 # include <iterator>
-# include "location.hpp"
-# include "Server.hpp"
-# include "../socket/socket.hpp"
 # include <stack>
 #include <iostream>
 #include <utility>
-
 #include <sstream>
+#include <string>
+#include <vector>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <poll.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <map>
+
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
@@ -28,8 +31,16 @@
 #include <errno.h>
 #include <map>
 #include <algorithm>
+# include <dirent.h>
+
+# include "location.hpp"
+# include "Server.hpp"
+# include "../socket/socket.hpp"
+#include "../srcs/dirent/dir.hpp"
 #include "../srcs/request/req.hpp"
+#include "../srcs/respond/res.hpp"
 #include "../srcs/cgi/cgi.hpp"
+
 
 
 # define METHODS std::string("GET POST PUT DELETE HEAD OPTIONS TRACE CONNECT PATCH")
@@ -38,5 +49,3 @@ typedef std::string string;
 
 
 std::vector<Server>	parse( int ac, char ** av );
-
-#endif
