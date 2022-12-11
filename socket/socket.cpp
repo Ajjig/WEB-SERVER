@@ -152,17 +152,48 @@ void Socket::read_fd()
 void Socket::write_fd(std::string res)
 {
 	// send data to client then after all data send close connection
-	int nwrite = 0;
-	int n = 0;
-	while (n < res.length())
-	{
-		nwrite = write(fd, res.c_str() + n, res.length() - n);
+	int nwrite, data_size = res.length();
+	n = data_size;
+	while (n > 0) {
+		nwrite = write(fd, res.c_str() + data_size - n, n);
+		if (nwrite < n) {
+			if (nwrite == -1 && errno != EAGAIN) {
+				perror("write error");
+			}
+			break;
+		}
 		if (nwrite >= 0)
-			n += nwrite;
+			n -= nwrite;
 	}
 	close(fd);
-	this->fds[i].fd = -1;
-	this->nfds--;
+	fds[i].fd = -1;
+
+	// send data to client in a child process
+	//int pid = fork();
+	//if (pid == 0)
+	//{
+	//	int nwrite = 0;
+	//	int n = 0;
+	//	while (n < res.length())
+	//	{
+	//		nwrite = write(fd, res.c_str() + n, res.length() - n);
+	//		if (nwrite >= 0)
+	//			n += nwrite;
+	//	}
+	//	close(fd);
+	//	exit(0);
+	//}
+	//else if (pid > 0)
+	//{
+	//	close(fd);
+	//	this->fds[i].fd = -1;
+	//	this->nfds--;
+	//}
+	//else
+	//{
+	//	perror("fork");
+	//	exit(1);
+	//}
 }
 
 int Socket::is_master_socket(int __fd)

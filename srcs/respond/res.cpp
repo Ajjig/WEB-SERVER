@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 17:53:34 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/11 00:50:01 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,36 +88,12 @@ void respond::init_body() {
         path = ROOT_PATH + this->req.get_path();
     }
 
-// method using fopen and fread and ftell and rewind
-    //const char* file_name = path.c_str();
-
-    //FILE* file_stream = fopen(file_name, "rb");
-    //string file_str;
-    //size_t file_size;
-
-    //if(file_stream != nullptr)
-    //{
-    //    fseek(file_stream, 0, SEEK_END);
-    //    long file_length = ftell(file_stream);
-    //    rewind(file_stream);
-        
-    //    char* buffer = new char[file_length];
-    //    file_size = fread(buffer, 1, file_length, file_stream);
-    //    file_str = string(buffer, file_size);
-    //    delete[] buffer;
-    //}
-    //fclose(file_stream);
-    
-    //this->body = file_str;
-    //this->content_length = file_size;
-
-    // trunsfer code up from using string to using vector
     const char* file_name = path.c_str();
-    
+
     FILE* file_stream = fopen(file_name, "rb");
-    std::vector<char> file_vec;
+    string file_str;
     size_t file_size;
-    
+
     if(file_stream != nullptr)
     {
         fseek(file_stream, 0, SEEK_END);
@@ -126,25 +102,15 @@ void respond::init_body() {
         
         char* buffer = new char[file_length];
         file_size = fread(buffer, 1, file_length, file_stream);
-        file_vec = std::vector<char>(buffer, buffer + file_size);
+        file_str = string(buffer, file_size);
         delete[] buffer;
     }
     fclose(file_stream);
     
-    // assing victor to body vector
-    this->body = std::string(file_vec.begin(), file_vec.end());
+    this->body = file_str;
     this->content_length = file_size;
-    
 
-
-
-// method using ifstream and vector
-    //std::ifstream file(path, std::ios::binary);
-    //std::vector<char> buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    //this->body = std::string(buffer.begin(), buffer.end());
-    //this->content_length = buffer.size();
 }
-
 
 std::string respond::get_date() {
     time_t rawtime;
