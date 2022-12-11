@@ -2,7 +2,6 @@
 
 
 Server::Server( std::vector<string> & config, size_t & i ) {
-	_name = "";
 	_port = -1;
 	_root = "./";
 	_host = "";
@@ -55,7 +54,17 @@ std::vector<Location> Server::getLocations() {
 }
 
 std::string Server::getName() {
-	return _name;
+	if (_names.size() > 0)
+		return _names[0];
+	return "";
+}
+
+std::vector<std::string> Server::getNames() {
+	return _names;
+}
+
+void Server::addName(std::string name) {
+	_names.push_back(name);
 }
 
 void Server::parse(std::vector<string> & config, size_t & i) {
@@ -101,7 +110,7 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 				std::cout << "Error: name must be followed by a name" << std::endl;
 				exit(EXIT_FAILURE);
 			}
-			_name = config[i + 1];
+			addName(config[i + 1]);
 		}
 		else if (config[i] == "location") {
 			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
@@ -129,7 +138,10 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 
 void Server::put( void ) {
 	std::cout << "port:     " << _port << std::endl;
-	std::cout << "name:     " << _name << std::endl;
+	std::cout << "name:     ";
+	for (size_t i = 0; i < _names.size(); i++)
+		std::cout << _names[i] << " ";
+	std::cout << std::endl;
 	for (size_t i = 0; i < _indexes.size(); i++)
 		std::cout << "index[0]: " << _indexes[i] << std::endl;
 	std::cout << "host:     " << _host << std::endl;
