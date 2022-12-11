@@ -215,7 +215,10 @@ void Socket::setup_multiple_interface(std::vector<Server> interface_list)
 
 		if (it->isBind() == true)
 		{
-			socket_id = this->init_socket(it->getPort(), it->getHost());
+			std::string fix_host = it->getHost();
+			if (fix_host == "localhost")
+				fix_host = "0.0.0.0";
+			socket_id = this->init_socket(it->getPort(), fix_host);
 			this->set_nonblocking(socket_id);
 			this->init_poll(socket_id);
 		}
