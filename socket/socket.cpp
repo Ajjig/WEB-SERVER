@@ -196,8 +196,8 @@ void Socket::setup_multiple_interface(std::vector<Server> interface_list)
 			this->init_poll(test);
 		}
 
-		std::cout << " * Running on http://" << it->getHost() <<  ":" << it->getPort() << "/"\
-			<< "under servername  : " << it->getName() <<  \
+		std::cout << " * Running on http://" << it->getHost() <<  ":" << it->getPort() << "/ "\
+			<< "Under servername  : " << (it->getName() != "" ? it->getName() : "Not Defined") <<  \
 			 " \033[31m(Press CTRL+C to quit)\033[0m" <<  std::endl;
 	}
 

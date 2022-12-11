@@ -2,10 +2,10 @@
 
 
 Server::Server( std::vector<string> & config, size_t & i ) {
-	_name = "webserv.com";
+	_name = "";
 	_port = -1;
 	_root = "./";
-	_host = "None";
+	_host = "";
 	parse(config, i);
 }
 
