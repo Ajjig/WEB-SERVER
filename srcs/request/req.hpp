@@ -30,7 +30,7 @@ class Request {
         // constructors and destructors
         Request() {};
         Request(std::string request);
-        Request(std::string request, Server &server) {
+        Request(std::string request, Server server) {
             this->parse_request(request);
             (void )server;
         };

@@ -312,7 +312,7 @@ std::string Socket::construct_response()
 	std::string test = current_server(master_socket, parse_server_name(get_http_header())).getName();
 	std::cout << "requested object  : " << test << std::endl;
 	
-	Request req(get_http_header());
+	Request req(get_http_header(), current_server(master_socket, parse_server_name(get_http_header())));
 	// acitve logs
 	req.req_logs();
 
