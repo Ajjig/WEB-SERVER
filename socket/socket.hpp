@@ -42,15 +42,17 @@ class Socket
         char http_header[BUFSIZ];
         int close_connection;
         int REQ_COUNT;
-        std::string construct_response();
-        std::string read_file(char *filename);
         int _port;
         std::string _host;
         std::vector<int> master_socket_list;
-        int current_interface_index(int _master_socket_fd);
-        std::string get_port_from_fd(int _master_socket_fd);
         std::vector<Server> __server_list;
-
+        
+        std::string construct_response();
+        std::string read_file(char *filename);
+        std::string get_port_from_fd(int _master_socket_fd);
+        int current_interface_index(int _master_socket_fd);
+        std::string parse_server_name(std::string server_name);
+    
     public:
         Socket(int port, std::string host);
         Socket(std::vector<Server> servers);
@@ -58,7 +60,7 @@ class Socket
         int set_nonblocking(int sockfd);
         int init_socket(int defined_port, std::string defined_host);
         void init_poll(int defined_master_socket);
-        Server current_server(int _master_socket_fd);
+        Server current_server(int _master_socket_fd, std::string server_name);
         void set_incoming_connection();
         void read_fd();
         void write_fd(std::string res);

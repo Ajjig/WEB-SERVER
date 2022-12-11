@@ -41,6 +41,7 @@ int Server::getPort() {
 void Server::setport(int port) {
 	this->_port = port;
 }
+
 std::string Server::getHost() {
 	return _host;
 }

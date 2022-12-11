@@ -19,6 +19,7 @@ class Server {
 		bool isBind();
 		void setBind(bool val);
 		void setport(int port);
+
 	private:
 
 		std::vector<Location> _locations;
