@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:01:45 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 00:46:11 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/11 17:41:09 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,9 @@ void request::parse_request(std::string request)
     while (getline(iss, line))
         lines.push_back(line);
     
+    // remove the \r from the end of the line
+    lines[0].erase(std::remove(lines[0].begin(), lines[0].end(), '\r'), lines[0].end());
+    
     // parse the first line to get the method, uri and http version
     std::string method = lines[0].substr(0, lines[0].find(" "));
     std::string uri = lines[0].substr(lines[0].find(" ") + 1, lines[0].find(" ", lines[0].find(" ") + 1) - lines[0].find(" ") - 1);
@@ -125,6 +128,7 @@ void request::parse_request(std::string request)
     std::string query = uri.substr(uri.find("?") + 1, uri.size() - uri.find("?") - 1);
     // check if the query is empty
     if (uri.find("?") != std::string::npos) {
+        // split the query into query parameters
         std::vector<std::string> query_params;
         std::string query_param;
         std::stringstream ss(query);
@@ -139,11 +143,22 @@ void request::parse_request(std::string request)
         }
     }
     
-    // parse the headers
-    for (int i = 1; i < lines.size() - 1; i++)
+    // parse the headers and store them in a map
+    for (int i = 1; i < lines.size(); i++)
     {
-        std::string header_name = lines[i].substr(0, lines[i].find(":"));
-        std::string header_value = lines[i].substr(lines[i].find(":") + 2, lines[i].size() - lines[i].find(":") - 2);
-        this->headers[header_name] = header_value;
+        try
+        {
+            // remove the \r
+            lines[i].erase(std::remove(lines[i].begin(), lines[i].end(), '\r'), lines[i].end());
+
+            std::string header_name = lines[i].substr(0, lines[i].find(":"));
+            std::string header_value = lines[i].substr(lines[i].find(":") + 2, lines[i].size() - lines[i].find(":") - 2);
+            this->headers[std::string(header_name)] = std::string(header_value);
+
+        } catch (const std::exception& e) {
+            // skip the line
+        }
     }
+
+    
 }

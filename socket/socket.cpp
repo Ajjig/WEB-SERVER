@@ -288,8 +288,5 @@ std::string Socket::construct_response()
 	if (req.get_method() == "GET")
 		res.Get();
 
-	std::cout << "\n\n" << res.get_header() << "\n\n";
-
-
     return res.get_response();
 }

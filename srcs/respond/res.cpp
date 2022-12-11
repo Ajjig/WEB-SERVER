@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/11 00:50:01 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/11 17:34:20 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,25 +53,24 @@ std::string respond::get_response() {
 };
 
 void respond::Get() {
-    
-    std::string type = this->req.get_type_file();
-    // check the status code if 404 set the type to html
-    if (this->status_code == 404) {
-        type = "html";
-    }
-    std::string content_type = this->get_type()[type];
-    
+    this->init_header();
+    this->init_body();
+}
+
+void respond::init_header() {
+    std::string header;
     std::string status_code = this->get_status_code();
+    std::string status_msg = this->status_msg()[status_code];
     std::string date = this->get_date();
-    std::string server = "Webserv/1.0";
     std::string content_length = std::to_string(this->content_length);
-    std::string connection = req.get_headers()["Connection"];
-    
-    std::string header = "HTTP/1.1 " + status_code + " " + this->status_msg()[std::string(status_code)] + "\r\n";
+    std::string content_type = this->get_type()[this->req.get_type_file()];
+    std::string connection = this->req.get_headers()["Connection"];
+    std::string http_version = this->req.get_http_version();
+
+    header += http_version + " " + status_code + " " + status_msg + "\r\n";
     header += "Date: " + date + "\r\n";
-    header += "Server: " + server + "\r\n";
-    header += "Content-Type: " + content_type + "\r\n";
     header += "Content-Length: " + content_length + "\r\n";
+    header += "Content-Type: " + content_type + "\r\n";
     header += "Connection: " + connection + "\r\n";
     header += "\r\n";
     

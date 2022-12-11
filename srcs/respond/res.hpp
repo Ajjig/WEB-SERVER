@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:04:01 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/10 17:53:28 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/11 13:10:28 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
             // methods
             void Get();
             void init_body();
+            void init_header();
             std::string get_status_code();
             std::string get_date();
             std::map<std::string, std::string> get_type();
