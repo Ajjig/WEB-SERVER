@@ -167,33 +167,7 @@ void Socket::write_fd(std::string res)
 	}
 	close(fd);
 	fds[i].fd = -1;
-
-	// send data to client in a child process
-	//int pid = fork();
-	//if (pid == 0)
-	//{
-	//	int nwrite = 0;
-	//	int n = 0;
-	//	while (n < res.length())
-	//	{
-	//		nwrite = write(fd, res.c_str() + n, res.length() - n);
-	//		if (nwrite >= 0)
-	//			n += nwrite;
-	//	}
-	//	close(fd);
-	//	exit(0);
-	//}
-	//else if (pid > 0)
-	//{
-	//	close(fd);
-	//	this->fds[i].fd = -1;
-	//	this->nfds--;
-	//}
-	//else
-	//{
-	//	perror("fork");
-	//	exit(1);
-	//}
+	nfds--;
 }
 
 int Socket::is_master_socket(int __fd)
@@ -309,9 +283,6 @@ std::string Socket::construct_response()
 
 	if (req.get_method() == "GET")
 		res.Get();
-
-	std::cout << "\n\n" << res.get_header() << "\n\n";
-
 
     return res.get_response();
 }
