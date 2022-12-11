@@ -90,7 +90,7 @@ int Socket::current_interface_index(int _master_socket_fd)
 
 bool is_in_vector(std::vector<std::string> vec, std::string val)
 {
-	for (int i = 0; i < vec.size(); ++i)
+	for (int i = 0; i < static_cast<int>(vec.size()); ++i)
 	{
 		// remove whitespace 
 		val.erase(std::remove(val.begin(), val.end(), ' '), val.end());
@@ -102,7 +102,7 @@ bool is_in_vector(std::vector<std::string> vec, std::string val)
 
 Server Socket::current_server(int _master_socket_fd, std::string server_name)
 {
-	for (int i = 0; i < __server_list.size(); ++i)
+	for (int i = 0; i < static_cast<int>(__server_list.size()); ++i)
 	{
 		if (this->get_port_from_fd(_master_socket_fd) == std::to_string(__server_list[i].getPort()) \
 			&& is_in_vector(__server_list[i].getNames(), server_name))
@@ -161,7 +161,7 @@ void Socket::read_fd()
 	}
 	else if (nread == 0)
 	{
-		perror("Client disconnected upexpectedly");
+		//perror("Client disconnected upexpectedly");
 		fds[i].fd = -1;
 		nfds--;
 	}
@@ -312,7 +312,7 @@ std::string Socket::construct_response()
 	std::string test = current_server(master_socket, parse_server_name(get_http_header())).getName();
 	std::cout << "requested object  : " << test << std::endl;
 	
-	request req(get_http_header());
+	Request req(get_http_header());
 	// acitve logs
 	req.req_logs();
 
