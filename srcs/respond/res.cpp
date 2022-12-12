@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 15:27:09 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/12 15:30:40 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,9 @@ Respond::Respond(Request &req) {
     } else {
         this->status_code = 404;
     }
-    this->list_is_allowed = true;
+
+    // allow list dir
+    this->list_is_allowed = false;
 
     // add get method to allowed methods for debug
     this->allowed_methods.push_back("GET");
