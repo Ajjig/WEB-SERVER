@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:02:05 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 00:28:09 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/12 15:22:47 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ class Request {
         std::string                         &get_path(void);
         // methods
         void                                parse_request(std::string request);
-        void                                req_logs(void);
         std::string                         get_type_file(void);
         std::string                         get_file_name(void);
         void                                set_path(std::string path);

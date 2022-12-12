@@ -317,12 +317,10 @@ std::string Socket::construct_response()
 	
 	Request req(get_http_header(), current_server(master_socket, parse_server_name(get_http_header())));
 	// acitve logs
-	req.req_logs();
+	//req.req_logs();
 
 	Respond res(req);
-
-	if (req.get_method() == "GET")
-		res.Get();
+	res.logs();
 
     return res.get_response();
 }

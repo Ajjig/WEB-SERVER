@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 00:09:53 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/12 15:27:09 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,15 @@ Respond::Respond(Request &req) {
         this->status_code = 404;
     }
     this->list_is_allowed = true;
-    this->init_body();
+
+    // add get method to allowed methods for debug
+    this->allowed_methods.push_back("GET");
+
+    // if method is get
+    if (this->req.get_method() == "GET") {
+        this->Get();
+    }
+
 }
 
 // setters and getters
@@ -75,8 +83,8 @@ std::string Respond::get_response() {
 };
 
 void Respond::Get() {
-    this->init_header();
     this->init_body();
+    this->init_header();
 }
 
 void Respond::init_header() {
@@ -112,19 +120,46 @@ void Respond::init_body() {
     // check if file or directory
     struct stat path_stat;
     stat(path.c_str(), &path_stat);
-    if (S_ISDIR(path_stat.st_mode)) {
-        // if directory
-        if (this->list_is_allowed) {
-            this->list_dir(path);
+    // check if the method is allowed
+    if (this->is_allowed_method(this->req.get_method())) {
+        // if method is allowed
+        if (S_ISDIR(path_stat.st_mode)) {
+            // if directory
+            if (this->list_is_allowed) {
+                this->list_dir(path);
+            } else {
+                this->init_403();
+            }
         } else {
-            this->body = "Error: directory listing is not allowed";
-            this->content_length = this->body.size();
+            s_file file = this->read_file(path.c_str());
+            this->body = file.str;
+            this->content_length = file.size;
         }
     } else {
-        s_file file = this->read_file(path.c_str());
-        this->body = file.str;
-        this->content_length = file.size;
+        // if method is not allowed
+        this->init_405();
     }
+}
+
+void Respond::init_403() {
+    this->status_code = 403;
+    this->body = this->read_file("./srcs/default/403/403.html").str;
+    this->content_length = this->body.size();
+}
+
+void Respond::init_405() {
+    this->status_code = 405;
+    this->body = this->read_file("./srcs/default/405/405.html").str;
+    this->content_length = this->body.size();
+}
+
+bool Respond::is_allowed_method(std::string method) {
+    for (int i = 0; i < (int)allowed_methods.size(); i++) {
+        if (allowed_methods[i] == method) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Respond::list_dir(std::string path) {
@@ -177,6 +212,14 @@ s_file Respond::read_file(std::string filename) {
     return (s_file){file_str, file_size, true};
 }
 
+void Respond::logs() {
+    std::string method = "\e[0;33m" + this->req.get_method() + "\e[0m";
+    std::string uri = "\e[0;37m" + this->req.get_path() + "\e[0m";
+    std::string http_version = "\e[0;35m" + this->req.get_http_version() + "\e[0m";
+    std::string respond_status = (this->status_code == 200 ? "\e[0;32m" : "\e[0;31m") + std::to_string(this->status_code) + "\e[0m";;
+    
+    std::cout << "[" <<  method << "] " << respond_status << " " << uri << " " << http_version << std::endl;
+}
 
 
 std::string Respond::get_date() {

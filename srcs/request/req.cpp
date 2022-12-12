@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:01:45 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 00:28:22 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/12 15:22:36 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,16 +77,6 @@ std::string Request::get_file_name(void)
 void Request::set_path(std::string path)
 {
     this->path = path;
-}
-
-// methods
-void Request::req_logs(void) {
-    std::string method = "\e[0;33m" + this->method + "\e[0m";
-    std::string uri = "\e[0;37m" + this->uri + "\e[0m";
-    std::string http_version = "\e[0;35m" + this->http_version + "\e[0m";
-    std::string respond_status = (this->respond_status == 200 ? "\e[0;32m" : "\e[0;31m") + std::to_string(this->respond_status) + "\e[0m";
-
-    std::cout << "[" <<  method << "] " << std::string(respond_status) << " " << uri << " " << http_version << std::endl;
 }
 
 void Request::parse_request(std::string request)
