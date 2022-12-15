@@ -1,22 +1,19 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   cgi.hpp                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/09 12:08:04 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 00:17:02 by roudouch         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #pragma once
 
 # include "../../include/header.hpp"
 
-    class cgi {
-        private:
-            Request *req;
-        public:
-            cgi(Request *req);
-    };
+class Cgi 
+{
+    private:
+        char **envp;
+        std::map<std::string, std::string> _bin_path;
+        std::string _bin;
+        std::string _file;
+
+    public:
+        Cgi(std::string file ,std::map<std::string, std::string> bin_path, char **envp);
+        ~Cgi ();
+
+        void exec_cgi();
+};

@@ -21,6 +21,8 @@ class Server {
 		bool isBind();
 		void setBind(bool val);
 		void setport(int port);
+		void setEnv(char **envp);
+		char **getEnv();
 
 	private:
 
@@ -32,6 +34,7 @@ class Server {
 		std::vector<std::string> _names;
 		std::string _host;
 		int _port;
+		char **_env;
 		std::vector<std::string> _indexes;
 };
 

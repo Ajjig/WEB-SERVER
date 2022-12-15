@@ -41,6 +41,14 @@ void Server::setport(int port) {
 	this->_port = port;
 }
 
+void Server::setEnv(char **envp) {
+	this->_env = envp;
+}
+
+char **Server::getEnv()
+{
+	return this->_env;
+}
 std::string Server::getHost() {
 	return _host;
 }
