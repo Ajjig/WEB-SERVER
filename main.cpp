@@ -11,12 +11,10 @@ void put_config(std::vector<Server> & servers) {
 	}
 }
 
-int main( int ac, char ** av , char ** envp) 
+int main( int ac, char ** av , char ** envp)
 {
 
 	std::vector<Server> servers = parse(ac, av);
-
-	put_config(servers); /* printing config */
 
 	Socket socket(servers);
 	socket.start();
