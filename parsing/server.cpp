@@ -27,6 +27,12 @@ void Server::addLocation(Location location) {
 	_locations.push_back(location);
 }
 
+std::string Server::getCGI(std::string ext) {
+	if (_cgi.find(ext) != _cgi.end())
+		return _cgi[ext];
+	return "None";
+}
+
 void Server::addIndex(string ind) {
 	_indexes.push_back(ind);
 }

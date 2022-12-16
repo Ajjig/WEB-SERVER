@@ -23,6 +23,7 @@ class Server {
 		void setport(int port);
 		void setEnv(char **envp);
 		char **getEnv();
+		std::string getCGI(std::string ext);
 
 	private:
 
