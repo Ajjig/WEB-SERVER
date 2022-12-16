@@ -4,6 +4,7 @@
 
 class Server {
 	public:
+		Server() {};
 		Server( std::vector<std::string> & config, size_t & i );
 		~Server();
 		void addLocation(Location location);

@@ -5,7 +5,6 @@ class Location {
 		Location(std::vector<std::string> & config, size_t & i);
 		~Location();
 		void setPath(std::string path);
-		std::string getPath();
 		void setRoot(std::string root);
 		std::string getRoot();
 		void addIndex(std::string index);

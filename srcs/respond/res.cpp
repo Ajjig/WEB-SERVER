@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 15:30:40 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 17:46:33 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,19 @@ bool _is_exist(const std::string& name) {
 // constructors and destructors
 Respond::Respond(Request &req) {
 
+    std::cout << "======= Respond constructor ========" << std::endl;
+    
+    // print vector from req.get_server().getLocations()
+    std::cout << "======= Locations ========" << std::endl;
+
+    std::vector<Location> locations = req.get_server().getLocations();
+    for (size_t i = 0; i < locations.size(); i++) {
+        std::cout << "Location " << i + 1 << ": " << locations[i].getRoot() << std::endl;
+    }
+
+    std::cout << "======= End Locations ========" << std::endl;
+    
+
     // remove last '/' if exist
     if (req.get_path().back() == '/')
         req.set_path(req.get_path().substr(0, req.get_path().size() - 1));
@@ -39,7 +52,7 @@ Respond::Respond(Request &req) {
     }
 
     // allow list dir
-    this->list_is_allowed = false;
+    this->list_is_allowed = true;
 
     // add get method to allowed methods for debug
     this->allowed_methods.push_back("GET");
@@ -49,6 +62,7 @@ Respond::Respond(Request &req) {
         this->Get();
     }
 
+    std::cout << "======= End constructor ========" << std::endl;
 }
 
 // setters and getters
@@ -211,7 +225,7 @@ s_file Respond::read_file(std::string filename) {
 
     fclose(file_stream);
     
-    return (s_file){file_str, file_size, true};
+    return (s_file){file_str, static_cast<int>(file_size), true};
 }
 
 void Respond::logs() {
