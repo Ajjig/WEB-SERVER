@@ -2,6 +2,7 @@
 
 class Location {
 	public:
+		Location() {};
 		Location(std::vector<std::string> & config, size_t & i);
 		~Location();
 		void setPath(std::string path);
