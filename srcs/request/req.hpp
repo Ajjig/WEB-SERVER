@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:02:05 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 15:22:47 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 17:11:29 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,17 @@ class Request {
         std::map<std::string, std::string>  headers;
         std::string                         file_name;
         std::string                         file_type;
+        Server                              server;
 
     public:
         // constructors and destructors
-        Request() {};
-        Request(std::string request);
+        Request(){};
+        //Request(std::string request);
         Request(std::string request, Server server);
         ~Request(){}
         
         // setters and getters
+        Server                              &get_server(void);
         std::map<std::string, std::string>  get_headers(void);
         std::string                         &get_method(void);
         std::string                         &get_uri(void);
