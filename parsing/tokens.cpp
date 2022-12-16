@@ -48,7 +48,7 @@ void	bind_checker(std::vector<Server> & servers, Server & s) {
 	s.setBind(true);
 }
 
-std::vector<Server> parse( int ac, char ** av ) {
+std::vector<Server> parse( int ac, char ** av , char ** envp) {
 
 	std::fstream		file;
 	string				buff;
@@ -79,6 +79,7 @@ std::vector<Server> parse( int ac, char ** av ) {
 		if (config[i] == "server") {
 			Server s(config, i);
 			bind_checker(servers, s);
+			s.setEnv(envp);
 			servers.push_back(s);
 		}
 	}

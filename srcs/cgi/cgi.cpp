@@ -5,7 +5,7 @@
 Cgi::Cgi(std::string file,std::map<std::string, std::string> bin_path, char **envp) : envp(envp), _bin_path(bin_path), _file(file)
 {
     this->find_bin();
-    this->start(this->exec_cgi());
+    this->set_body(this->exec_cgi());
 }
 
 Cgi::~Cgi()
@@ -34,8 +34,44 @@ void Cgi::find_bin()
 
 }
 
+int Cgi::check_file(std::string file)
+{
+    // check for existence
+    if (!access(file.c_str(), F_OK))
+    {
+        if (access(file.c_str(), X_OK) == -1)
+            return 403;
+ 
+        if (access(file.c_str(), R_OK) == -1)
+            return 403;
+        return 200;
+    }
+    return 404;
+}
+
+int Cgi::check_bin(std::string bin)
+{
+    if (bin == "none")
+        return 404;
+    if (access(bin.c_str(), F_OK) == -1)
+        return 404;
+    if (access(bin.c_str(), X_OK) == -1)
+        return 403;
+    return 200;
+}
+
 std::string Cgi::exec_cgi()
 {
+    // check for existence and permissions
+    int status_bin = this->check_bin(this->_bin);
+    if (status_bin != 200)
+        return std::to_string(status_bin);
+    
+    int status_file = this->check_file(this->_file);
+    if (status_file != 200)
+        return std::to_string(status_file);
+    // check for existence and permissions
+    
     int fd[2];
     pipe(fd);
     int pid = fork();
@@ -47,10 +83,6 @@ std::string Cgi::exec_cgi()
 
     int save_stdout = dup(1);
     int save_stdin = dup(0);
-
-
-    if (this->_bin == "none")
-        return "none";
 
     if (pid == 0)
     {
@@ -82,20 +114,12 @@ std::string Cgi::exec_cgi()
     return this->_buffer;
 }
 
-std::string Cgi::start(std::string buf)
+void Cgi::set_body(std::string buf)
 {
-    if (buf == "none")
-    {
-        this->_buffer = "none";
-        return NULL;
-    }
-    else 
-    {
-        return this->_buffer;
-    }
+    this->_buffer = buf;
 }
 
-std::string Cgi::get_response()
+std::string Cgi::get_body()
 {
     return this->_buffer;
 }
