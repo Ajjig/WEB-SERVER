@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:01:45 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 19:33:23 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 20:39:30 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,11 @@ void Request::set_path(std::string path)
 
 Server &Request::get_server() {
     return this->server;
+}
+
+void Request::set_content_type(std::string file_type)
+{
+    this->file_type = file_type;
 }
 
 void Request::parse_request(std::string request)

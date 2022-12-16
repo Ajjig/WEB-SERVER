@@ -11,6 +11,16 @@ Cgi::Cgi(std::string file,std::map<std::string, std::string> bin_path, char **en
 Cgi::Cgi(Server server, std::string file) : _file(file) , _server(server)
 {
     
+    std::string path = "";
+    for (size_t i = 0; i < server.getLocations().size(); i++) 
+     {
+        if ("/cgi-bin" == server.getLocationPaths()[i])
+        {
+            // remove the /cgi-bin from the file path using find   
+            this->_file = this->_file.substr(this->_file.find(server.getLocationPaths()[i]) + server.getLocationPaths()[i].length());
+            this->_file =  server.getLocations()[i].getRoot() + this->_file;
+        }
+    }
     this->envp = server.getEnv();
     this->find_bin();
     this->set_body(this->exec_cgi());
@@ -24,39 +34,38 @@ Cgi::~Cgi()
 
 void Cgi::find_bin()
 {
-    std::string path = _file.substr(_file.find_last_of(".") + 1);
-    for (std::map<std::string, std::string>::iterator it = _bin_path.begin(); it != _bin_path.end(); it++)
-    {
-        if (it->first == path)
-        {
-            if (it->first == "cgi")
-            {
-                this->_bin = it->second + std::string("/") + _file;
-                return ;
-            }
-            this->_bin = it->second;
-            return ;
-        }
-    }
-    this->_bin = "none";
-    
-    // std::string ext = _file.substr(_file.find_last_of("."));
-    // std::string bin =  _server.getCGI(ext);
-    // if (bin == "None")
-    // {
-    //     this->_bin = "none";
-    //     return ;
-    // }
-    // else 
-    // {
-    //     if (ext == "cgi")
-    //     {
-    //         this->_bin = std::string(getenv("PWD")) + std::string("/") + bin;
-    //         return ;
-    //     }
-    //     this->_bin = bin;
-    //     return ;
-    // }
+    //std::string path = _file.substr(_file.find_last_of(".") + 1);
+    //for (std::map<std::string, std::string>::iterator it = _bin_path.begin(); it != _bin_path.end(); it++)
+    //{
+    //    if (it->first == path)
+    //    {
+    //        if (it->first == "cgi")
+    //        {
+    //            this->_bin = it->second + std::string("/") + _file;
+    //            return ;
+    //        }
+    //        this->_bin = it->second;
+    //        return ;
+    //    }
+    //}
+    //this->_bin = "none";
+     std::string ext = _file.substr(_file.find_last_of("."));
+     std::string bin =  _server.getCGI(ext);
+     if (bin == "None")
+     {
+         this->_bin = "none";
+         return ;
+     }
+     else 
+     {
+         if (ext == "cgi")
+         {
+             this->_bin = std::string(getenv("PWD")) + std::string("/") + bin;
+             return ;
+         }
+         this->_bin = bin;
+         return ;
+     }
 
 }
 

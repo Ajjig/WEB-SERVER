@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 20:09:48 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 20:41:44 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,14 @@ Respond::Respond(Request &req) {
         }
         else {
             this->status_code = 200;
+            this->req.set_content_type("html");
+            this->content_length = this->body.size();
             init_header();
+
         }
+        std::cout << "\n\n Header: " << this->get_header() << "\n\n" << std::endl;
+
+        std::cout << "body: " << this->body << std::endl;
 
         return ;
     }
