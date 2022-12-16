@@ -24,6 +24,7 @@ class Server {
 		void setport(int port);
 		void setEnv(char **envp);
 		char **getEnv();
+		std::string getCGI(std::string ext);
 
 	private:
 
@@ -37,6 +38,7 @@ class Server {
 		int _port;
 		char **_env;
 		std::vector<std::string> _indexes;
+		std::map<std::string, std::string> _cgi;
 };
 
 std::ostream & operator<<(std::ostream & out, Server const &server);

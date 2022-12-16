@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 17:46:33 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 17:50:35 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 bool _is_exist(const std::string& name) {
     bool ret;
-    
+
     std::ifstream f(name.c_str());
     ret = f.good();
     f.close();
-    
+
     return ret;
 }
 
@@ -41,7 +41,7 @@ Respond::Respond(Request &req) {
     // remove last '/' if exist
     if (req.get_path().back() == '/')
         req.set_path(req.get_path().substr(0, req.get_path().size() - 1));
-    
+
     std::string path = ROOT_PATH + req.get_path();
 
     this->req = req;
@@ -71,7 +71,7 @@ std::string Respond::get_status_code() {
 }
 
 std::string Respond::get_header() {
-    // make header string from map header and return it 
+    // make header string from map header and return it
     // first line of header is status code and status message look like this: HTTP/1.1 200 OK
     std::string status_code = this->header["status_code"];
     std::string http_version = this->header["http_version"];
@@ -104,7 +104,7 @@ void Respond::Get() {
 }
 
 void Respond::init_header() {
-    
+
     std::string status_code = this->get_status_code();
     std::string date = this->get_date();
     std::string content_length = std::to_string(this->content_length);
@@ -120,7 +120,7 @@ void Respond::init_header() {
     this->header["Server"] = "Webserv/1.0";
     this->header["http_version"] = http_version;
     this->header["status_code"] = status_code;
-    
+
 }
 
 void Respond::init_body() {
@@ -189,7 +189,7 @@ void Respond::list_dir(std::string path) {
         // check if file or directory
         struct stat path_stat;
         stat(std::string(path + "/" + *it).c_str(), &path_stat);
-        
+
         if (S_ISDIR(path_stat.st_mode)) {
             // if directory
             // handle /. directories
@@ -217,14 +217,13 @@ s_file Respond::read_file(std::string filename) {
         fseek(file_stream, 0, SEEK_END);
         long file_length = ftell(file_stream);
         rewind(file_stream);
-        
+
         char* buffer = new char[file_length];
         file_size = fread(buffer, 1, file_length, file_stream);
         file_str = string(buffer, file_size);
         delete[] buffer;
 
     fclose(file_stream);
-    
     return (s_file){file_str, static_cast<int>(file_size), true};
 }
 
@@ -233,7 +232,7 @@ void Respond::logs() {
     std::string uri = "\e[0;37m" + this->req.get_path() + "\e[0m";
     std::string http_version = "\e[0;35m" + this->req.get_http_version() + "\e[0m";
     std::string respond_status = (this->status_code == 200 ? "\e[0;32m" : "\e[0;31m") + std::to_string(this->status_code) + "\e[0m";;
-    
+
     std::cout << "[" <<  method << "] " << respond_status << " " << uri << " " << http_version << std::endl;
 }
 

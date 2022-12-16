@@ -33,7 +33,9 @@ void Location::addIndex(string index) {
 }
 
 
-
+bool Location::isAutoindex() {
+	return _autoindex;
+}
 
 std::vector<string> Location::getIndexes() {
 	return _indexes;
@@ -66,6 +68,16 @@ void Location::parse(std::vector<string> & config, size_t & i) {
 		}
 		else if (config[i] == "}") {
 			return ;
+		}
+		else if (config[i] == "autoindex") {
+			if (config[++i] == "on")
+				_autoindex = true;
+			else if (config[i] == "off")
+				_autoindex = false;
+			else {
+				std::cout << "Error: autoindex must be followed by 'on' or 'off'" << std::endl;
+				exit(EXIT_FAILURE);
+			}
 		}
 	}
 }
