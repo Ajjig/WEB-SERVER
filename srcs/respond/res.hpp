@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:04:01 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 21:16:19 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 22:01:22 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ class Respond
         void init_403();
         void init_405();
         void init_404();
+        void init_500();
+        void native_error(std::string msg);
         void logs();
 
         // the response

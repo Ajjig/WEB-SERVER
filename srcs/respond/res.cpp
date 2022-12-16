@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 21:51:04 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 22:43:16 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,7 @@ Respond::Respond(Request &req) {
 
     // check if there is a location that match the path
     std::vector<Location> locations = req.get_server().getLocations();
-    std::string path;
     
-    std::cout << "path: " << req.get_path() << std::endl;
     // if cgi 
     if (req.get_path().find("/cgi-bin/") != std::string::npos) {
         try {
@@ -42,63 +40,92 @@ Respond::Respond(Request &req) {
             
             std::string res = cgi.get_body();
             if (res == "404") {
+
                 this->status_code = 404;
                 this->init_404();
                 
-                std::cout << "\n\n Header: " << this->get_header() << "\n\n" << std::endl;
-                std::cout << "body: |" << this->body << "| "<< std::endl;
             } else if (res == "403") {
+
                 this->status_code = 403;
+
             } else if (res == "bin not found") {
+
                 this->status_code = 404;
+                
             }
             else {
+
+                std::string content_type;
+                for (size_t i = 0; i < res.size(); i++) {
+                    if (res[i] == '\n') {
+                        content_type = res.substr(0, i);
+                        res = res.substr(i);
+                        break;
+                    }
+                }
+
+                // get content type value from content_type string
+                std::string value_content_type = "";
+                for (size_t i = 0; i < content_type.size(); i++) {
+                    if (content_type[i] == ':') {
+                        value_content_type = content_type.substr(i + 2);
+                        break;
+                    }
+                }
+                
                 this->body = res;
+                
                 this->status_code = 200;
-                this->req.set_content_type("html");
+                if (value_content_type == "text/html")
+                    this->req.set_content_type("html");
                 this->content_length = this->body.size();
                 init_header();
             }
             
         } catch (std::exception &e) {
-            std::cout << e.what() << std::endl;
-            this->status_code = 404;
-            this->init_404();
+            std::cout << "\033[95m" << e.what() << std::endl;
+            this->status_code = 500;
+            this->init_500();
         }
 
     } else {
-        
-        bool is_match = false;
-        for (size_t i = 0; i < locations.size(); i++) {
-            if (this->req.get_path() == req.get_server().getLocationPaths()[i]) {
-                this->location = locations[i];
-                is_match = true;
-                break;
+        try {
+            bool is_match = false;
+            for (size_t i = 0; i < locations.size(); i++) {
+                if (this->req.get_path() == req.get_server().getLocationPaths()[i]) {
+                    this->location = locations[i];
+                    is_match = true;
+                    break;
+                }
             }
-        }
-        // set 404 if no location match
-        if (not is_match) {
-            
-            this->status_code = 404;
-            if (this->req.get_method() == "GET") {
-                this->Get();
-            }
-            
-        } else {
-            
-            if (_is_exist(this->location.getRoot())) {
-                this->status_code = 200;
-            } else {
+            // set 404 if no location match
+            if (not is_match) {
+                
                 this->status_code = 404;
-            }
-            // allow list dir
-            this->list_is_allowed = this->location.isAutoindex();
+                if (this->req.get_method() == "GET") {
+                    this->Get();
+                }
+                
+            } else {
+                
+                if (_is_exist(this->location.getRoot())) {
+                    this->status_code = 200;
+                } else {
+                    this->status_code = 404;
+                }
+                // allow list dir
+                this->list_is_allowed = this->location.isAutoindex();
 
-            // if method is get
-            if (this->req.get_method() == "GET") {
-                this->Get();
+                // if method is get
+                if (this->req.get_method() == "GET") {
+                    this->Get();
+                }
+                
             }
-            
+        } catch (std::exception &e) {
+            std::cout << "\033[95m" << e.what() << std::endl;
+            this->status_code = 500;
+            this->init_500();
         }
     }
     
@@ -220,6 +247,23 @@ void Respond::init_404() {
     this->content_length = this->body.size();
 }
 
+void Respond::init_500() {
+    try {
+        this->status_code = 500;
+        this->body = this->read_file("./srcs/default/500/500.html").str;
+        this->content_length = this->body.size();
+    } catch (std::exception &e) {
+        this->native_error(e.what());
+    }
+}
+
+void Respond::native_error(std::string msg) {
+    perror(msg.c_str());
+    this->status_code = 500;
+    this->body = "<html><head><title>500 Internal Server Error</title></head><body><h1>500 Internal Server Error</h1></body></html>";
+    this->content_length = this->body.size();
+}
+
 bool Respond::is_allowed_method(std::string method) {
     return this->location.isAllowed(method);
 }
@@ -255,20 +299,18 @@ void Respond::list_dir(std::string path) {
 s_file Respond::read_file(std::string filename) {
     FILE* file_stream = fopen(filename.c_str(), "rb");
     if (file_stream == NULL) {
-        return (s_file){NULL, 0, false};
+        throw std::runtime_error("Error opening file"); // if file not found
     }
     string file_str;
     size_t file_size;
+        fseek(file_stream, 0, SEEK_END); // Reposition stream position indicator to the end of the stream
+        long file_length = ftell(file_stream); // return the number of bytes from the beginning of the file.
+        rewind(file_stream); // Reposition stream position indicator to the beginning of the stream
 
-        fseek(file_stream, 0, SEEK_END);
-        long file_length = ftell(file_stream);
-        rewind(file_stream);
-
-        char* buffer = new char[file_length];
-        file_size = fread(buffer, 1, file_length, file_stream);
-        file_str = string(buffer, file_size);
-        delete[] buffer;
-
+        char* buffer = new char[file_length]; // Allocate memory for the entire content
+        file_size = fread(buffer, 1, file_length, file_stream); // Read the file into the buffer
+        file_str = string(buffer, file_size); // Copy buffer to string
+        delete[] buffer; // Deallocate buffer memory
     fclose(file_stream);
     return (s_file){file_str, static_cast<int>(file_size), true};
 }
