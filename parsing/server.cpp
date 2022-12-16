@@ -37,6 +37,10 @@ void Server::addIndex(string ind) {
 	_indexes.push_back(ind);
 }
 
+std::vector<std::string> & Server::getLocationPaths() {
+	return _locationPaths;
+}
+
 void Server::setRoot(string root) {
 	_root = root;
 }

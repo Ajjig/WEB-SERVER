@@ -11,10 +11,30 @@ void put_config(std::vector<Server> & servers) {
 	}
 }
 
+void put_logs(int ac, char ** av, std::vector<Server> & servers) {
+	size_t locationCount = 0;
+
+	for (size_t i = 0; i < servers.size(); i++)
+		locationCount += servers[i].getLocations().size();
+
+
+	std::cout << std::endl << GREEN;
+	for (size_t i = 0; i < 80; i++) {
+		std::cout << "▉" << std::flush;
+		usleep(10000);
+	}
+	std::cout << std::endl << std::endl << YELLOW << " * " << "'" << GREEN << ( ac == 1 ? "./webserv.conf" : av[1] ) << YELLOW <<
+	"' config file was parsed successfully " <<
+	servers.size() << " servers were found" <<
+	std::endl << " * Total locations: " << locationCount <<
+	std::endl << std::endl << NC;
+}
+
 int main( int ac, char ** av, char ** envp)
 {
 
 	std::vector<Server> servers = parse(ac, av, envp);
+	put_logs(ac, av, servers);
 
 	Socket socket(servers);
 	socket.start();
