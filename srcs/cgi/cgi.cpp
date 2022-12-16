@@ -10,8 +10,6 @@ Cgi::Cgi(std::string file,std::map<std::string, std::string> bin_path, char **en
 
 Cgi::Cgi(Server server, std::string file) : _file(file) , _server(server)
 {
-    
-    std::string path = "";
     for (size_t i = 0; i < server.getLocations().size(); i++) 
      {
         if ("/cgi-bin" == server.getLocationPaths()[i])
@@ -22,6 +20,7 @@ Cgi::Cgi(Server server, std::string file) : _file(file) , _server(server)
         }
     }
     this->envp = server.getEnv();
+    this->set_env();
     this->find_bin();
     this->set_body(this->exec_cgi());
 }
@@ -34,21 +33,6 @@ Cgi::~Cgi()
 
 void Cgi::find_bin()
 {
-    //std::string path = _file.substr(_file.find_last_of(".") + 1);
-    //for (std::map<std::string, std::string>::iterator it = _bin_path.begin(); it != _bin_path.end(); it++)
-    //{
-    //    if (it->first == path)
-    //    {
-    //        if (it->first == "cgi")
-    //        {
-    //            this->_bin = it->second + std::string("/") + _file;
-    //            return ;
-    //        }
-    //        this->_bin = it->second;
-    //        return ;
-    //    }
-    //}
-    //this->_bin = "none";
      std::string ext = _file.substr(_file.find_last_of("."));
      std::string bin =  _server.getCGI(ext);
      if (bin == "None")
@@ -157,4 +141,41 @@ void Cgi::set_body(std::string buf)
 std::string Cgi::get_body()
 {
     return this->_buffer;
+}
+
+
+void Cgi::set_env()
+{
+    // set env variables
+    for (size_t i = 0; this->envp[i]; i++)
+    {
+        std::string env = std::string(this->envp[i]);
+        std::string key = env.substr(0, env.find("="));
+        std::string value = env.substr(env.find("=") + 1);
+        this->_env[key] = value;
+    }
+    // set Server specific variables
+    this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
+    this->_env["SERVER_NAME"] = this->_server.getName();
+    this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+    this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+    this->_env["SERVER_PORT"] = std::to_string(this->_server.getPort());
+    this->_env["REQUEST_METHOD"] = "GET";
+    this->_env["PATH_INFO"] = this->_file;
+    this->_env["PATH_TRANSLATED"] = this->_file;
+    this->_env["SCRIPT_NAME"] = this->_file;
+    this->_env["QUERY_STRING"] = this->_file;
+    this->_env["REMOTE_HOST"] = this->_server.getHost();
+
+    // add env to envp
+
+    this->envp = new char*[this->_env.size() + 1];
+    int i = 0;
+    for (std::map<std::string, std::string>::iterator it = this->_env.begin(); it != this->_env.end(); it++)
+    {
+        std::string env = it->first + "=" + it->second;
+        this->envp[i] = new char[env.length() + 1];
+        strcpy(this->envp[i], env.c_str());
+        i++;
+    }
 }

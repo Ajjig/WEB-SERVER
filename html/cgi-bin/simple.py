@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-print ('<html>')
-print ('<head>')
-print ('<title>Hello World - First CGI Program</title>')
-print ('</head>')
-print ('<body>')
-print ('<h2>Hello World! This is my first CGI program</h2>')
-print ('</body>')
-print ('</html>')
+print('Content-Type: text/html')    # HTML is following
+
+print('')                           # require blank line between CGI header and data
+
+# content
+
+print('<b>Hello World</b>')

@@ -12,10 +12,12 @@ class Cgi
         std::string _file;
         std::string _buffer;
         Server _server;
+        std::map<std::string, std::string> _env;
 
         int check_file(std::string file);
         int check_bin(std::string bin);
         void find_bin();
+        void set_env();
         std::string exec_cgi();
     
     public:
