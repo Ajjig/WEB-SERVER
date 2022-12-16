@@ -25,6 +25,7 @@ class Server {
 		void setEnv(char **envp);
 		char **getEnv();
 		std::string getCGI(std::string ext);
+		std::vector<std::string> & getLocationPaths();
 
 	private:
 

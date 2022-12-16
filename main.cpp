@@ -11,10 +11,18 @@ void put_config(std::vector<Server> & servers) {
 	}
 }
 
-int main( int ac, char ** av, char ** envp) 
+void put_logs(int ac, char ** av, std::vector<Server> & servers) {
+	std::cout << std::endl << ( ac == 1 ? "webserv.conf" : av[1] ) <<
+	"config file was parsed successfully" <<
+	servers.size() << " servers were found" <<
+	std::endl << std::endl;
+}
+
+int main( int ac, char ** av, char ** envp)
 {
 
 	std::vector<Server> servers = parse(ac, av, envp);
+	put_logs(ac, av, servers);
 
 	Socket socket(servers);
 	socket.start();
