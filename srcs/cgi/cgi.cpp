@@ -8,6 +8,14 @@ Cgi::Cgi(std::string file,std::map<std::string, std::string> bin_path, char **en
     this->set_body(this->exec_cgi());
 }
 
+Cgi::Cgi(Server server, std::string file) : _file(file) , _server(server)
+{
+    
+    this->envp = server.getEnv();
+    this->find_bin();
+    this->set_body(this->exec_cgi());
+}
+
 Cgi::~Cgi()
 {
 
@@ -31,6 +39,24 @@ void Cgi::find_bin()
         }
     }
     this->_bin = "none";
+    
+    // std::string ext = _file.substr(_file.find_last_of("."));
+    // std::string bin =  _server.getCGI(ext);
+    // if (bin == "None")
+    // {
+    //     this->_bin = "none";
+    //     return ;
+    // }
+    // else 
+    // {
+    //     if (ext == "cgi")
+    //     {
+    //         this->_bin = std::string(getenv("PWD")) + std::string("/") + bin;
+    //         return ;
+    //     }
+    //     this->_bin = bin;
+    //     return ;
+    // }
 
 }
 
