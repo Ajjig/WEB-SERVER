@@ -14,10 +14,12 @@ class Location {
 		void setAllowed(std::string allowed);
 		std::vector<std::string> getAllowed();
 		bool isAllowed(std::string method);
+		bool isAutoindex();
 
 
 	private:
 		std::string					_root;
 		std::vector<std::string>	_indexes;
 		std::vector<std::string>	_allowed;
+		bool						_autoindex;
 };
