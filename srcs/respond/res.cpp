@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 21:20:39 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 21:51:04 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,29 +34,36 @@ Respond::Respond(Request &req) {
     std::cout << "path: " << req.get_path() << std::endl;
     // if cgi 
     if (req.get_path().find("/cgi-bin/") != std::string::npos) {
-        
-        std::cout << "\n\ncgi: " << req.get_uri() <<  "\n\n" << std::endl;
+        try {
+            
+            std::cout << "\n\ncgi: " << req.get_uri() <<  "\n\n" << std::endl;
 
-        Cgi cgi(this->req.get_server(), this->req.get_uri());
-        
-        std::string res = cgi.get_body();
-        if (res == "404") {
+            Cgi cgi(this->req.get_server(), this->req.get_uri());
+            
+            std::string res = cgi.get_body();
+            if (res == "404") {
+                this->status_code = 404;
+                this->init_404();
+                
+                std::cout << "\n\n Header: " << this->get_header() << "\n\n" << std::endl;
+                std::cout << "body: |" << this->body << "| "<< std::endl;
+            } else if (res == "403") {
+                this->status_code = 403;
+            } else if (res == "bin not found") {
+                this->status_code = 404;
+            }
+            else {
+                this->body = res;
+                this->status_code = 200;
+                this->req.set_content_type("html");
+                this->content_length = this->body.size();
+                init_header();
+            }
+            
+        } catch (std::exception &e) {
+            std::cout << e.what() << std::endl;
             this->status_code = 404;
             this->init_404();
-            
-            std::cout << "\n\n Header: " << this->get_header() << "\n\n" << std::endl;
-            std::cout << "body: |" << this->body << "| "<< std::endl;
-        } else if (res == "403") {
-            this->status_code = 403;
-        } else if (res == "bin not found") {
-            this->status_code = 404;
-        }
-        else {
-            this->body = res;
-            this->status_code = 200;
-            this->req.set_content_type("html");
-            this->content_length = this->body.size();
-            init_header();
         }
 
     } else {
