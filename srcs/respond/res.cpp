@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 18:14:24 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 19:03:56 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,52 +26,45 @@ bool _is_exist(const std::string& name) {
 Respond::Respond(Request &req) {
 
     this->req = req;
-    std::cout << "======= Respond constructor ========" << std::endl;
     
-    std::cout << "HERE: |" << this->req.get_path() << "|" << std::endl;
-
-    
-    std::cout << "======= Locations ========" << std::endl;
-
-    std::vector<Location> locations = req.get_server().getLocations();
-    for (size_t i = 0; i < locations.size(); i++) {
-        std::cout << "Location " << i + 1 << ": " << locations[i].getRoot() << std::endl;
-    }
-
-    std::cout << "======= End Locations ========\n\n" << std::endl;
-
     // check if there is a location that match the path
+    std::vector<Location> locations = req.get_server().getLocations();
+    
     for (size_t i = 0; i < locations.size(); i++) {
-        if (req.get_path().find(locations[i].getRoot()) != std::string::npos) {
-            std::cout << "Location " << i + 1 << " match" << std::endl;
+        if (this->req.get_path().find(locations[i].getRoot()) != std::string::npos) {
+            this->location = locations[i];
             break;
         }
     }
-    
-
-    // remove last '/' if exist
-    if (req.get_path().back() == '/')
-        req.set_path(req.get_path().substr(0, req.get_path().size() - 1));
-
-    std::string path = ROOT_PATH + req.get_path();
-
-    if (_is_exist(path)) {
-        this->status_code = 200;
-    } else {
+    std::cout << "\n\n@@@@ROOT: "<< this->location.getRoot() << "\n\n"<< std::endl;
+    // set 404 if no location match
+    if (this->location.getRoot().empty()) {
         this->status_code = 404;
+    } else {
+
+        //// remove last '/' if exist
+        //if (req.get_path().back() == '/')
+        //    req.set_path(req.get_path().substr(0, req.get_path().size() - 1));
+
+
+        if (_is_exist(this->location.getRoot())) {
+            this->status_code = 200;
+        } else {
+            this->status_code = 404;
+        }
+        // allow list dir
+        this->list_is_allowed = this->location.isAutoindex();
+
+        // add get method to allowed methods for debug
+        this->allowed_methods.push_back("GET");
+
+        // if method is get
+        if (this->req.get_method() == "GET") {
+            this->Get();
+        }
+        
     }
-
-    // allow list dir
-    this->list_is_allowed = true;
-
-    // add get method to allowed methods for debug
-    this->allowed_methods.push_back("GET");
-
-    // if method is get
-    if (this->req.get_method() == "GET") {
-        this->Get();
-    }
-
+    
     std::cout << "======= End constructor ========" << std::endl;
 }
 
@@ -140,7 +133,7 @@ void Respond::init_body() {
     if (this->status_code == 404) {
         path = "./srcs/default/404/404.html";
     } else {
-        path = ROOT_PATH + this->req.get_path();
+        path = this->location.getRoot();
     }
 
     // check if file or directory
@@ -195,7 +188,7 @@ void Respond::list_dir(std::string path) {
         // create link to file or directory
         std::string link = std::string(path) + "/" + *it;
         // remove ROOT_PATH from path
-        link.erase(0, std::string(ROOT_PATH).size());
+        link.erase(0, std::string(this->location.getRoot()).size());
         // check if file or directory
         struct stat path_stat;
         stat(std::string(path + "/" + *it).c_str(), &path_stat);
