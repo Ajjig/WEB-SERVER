@@ -1,6 +1,6 @@
 NAME = webserv
 CC = c++
-CPPFLAGS = -std=c++98 
+CPPFLAGS = -std=c++98 -Wall -Wextra -Werror
 
 SRCS = main.cpp ${addprefix ./parsing/, location.cpp tokens.cpp server.cpp}
 SRCS += ${addprefix ./socket/, socket.cpp} \

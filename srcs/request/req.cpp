@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:01:45 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/12 15:22:36 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 17:11:11 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,14 @@ bool is_exist (const std::string& name) {
 }
 
 // constructors
-Request::Request(std::string request)
-{
-    this->parse_request(request);
-}
+//Request::Request(std::string request)
+//{
+//    this->parse_request(request);
+//}
 
 Request::Request(std::string request, Server server) {
     this->parse_request(request);
-    (void )server;
+    this->server = server;
 };
 
 // setters and getters
@@ -77,6 +77,10 @@ std::string Request::get_file_name(void)
 void Request::set_path(std::string path)
 {
     this->path = path;
+}
+
+Server &Request::get_server() {
+    return this->server;
 }
 
 void Request::parse_request(std::string request)

@@ -1,5 +1,10 @@
 #include "../include/header.hpp"
 
+#define VALIDATE_END(error) if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) { \
+				std::cout << error << std::endl; \
+				exit(EXIT_FAILURE); \
+			} \
+
 
 Server::Server( std::vector<string> & config, size_t & i ) {
 	_port = -1;
@@ -20,6 +25,12 @@ Server::~Server() {}
 
 void Server::addLocation(Location location) {
 	_locations.push_back(location);
+}
+
+std::string Server::getCGI(std::string ext) {
+	if (_cgi.find(ext) != _cgi.end())
+		return _cgi[ext];
+	return "None";
 }
 
 void Server::addIndex(string ind) {
@@ -80,53 +91,46 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 	int		bracket	= 0;
 	size_t	tmp = i - 1;
 	bool	multiplePorts = false;
-	i +=2 ;
+	i += 2 ;
+
 	for ( ; i < config.size(); i++) {
-		if (config[i] == "index")
+		if (config[i] == "index") {
 			while (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
 				addIndex(config[i + 1]);
 				i++;
 			}
+		}
 		else if (config[i] == "root") {
-			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
-				std::cout << "Error: root must be followed by a path" << std::endl;
-				exit(EXIT_FAILURE);
-			}
+			VALIDATE_END("Error: root must be followed by a path");
+			setRoot(config[i + 1]);
 		}
 		else if (config[i] == "listen") {
 			while (config[++i] == "");
-			if (i >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
-				std::cout << "Error: port must be followed by a number" << std::endl;
-				exit(EXIT_FAILURE);
-			} else {
-				_port = std::atoi(config[i].c_str());
-				if (std::atoi(config[i + 1].c_str()) != 0) {
-					multiplePorts = true;
-					config[i] = "";
-				}
+			VALIDATE_END("Error: listen must be followed by a number 0 - 65535");
+			_port = std::atoi(config[i].c_str());
+			if (std::atoi(config[i + 1].c_str()) != 0) {
+				multiplePorts = true;
+				config[i] = "";
 			}
 		}
 		else if (config[i] == "host") {
-			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
-				std::cout << "Error: host must be followed by a name" << std::endl;
-				exit(EXIT_FAILURE);
-			}
+			VALIDATE_END("Error: host must be followed by a name");
 			_host = config[i + 1];
 		}
 		else if (config[i] == "server_name") {
-			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
-				std::cout << "Error: name must be followed by a name" << std::endl;
-				exit(EXIT_FAILURE);
-			}
+			VALIDATE_END("Error: server_name must be followed by a name");
 			addName(config[i + 1]);
 		}
 		else if (config[i] == "location") {
-			if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) {
-				std::cout << "Error: location must be followed by a path" << std::endl;
-				exit(EXIT_FAILURE);
-			}
+			VALIDATE_END("Error: location must be followed by a path");
 			_locationPaths.push_back(config[i + 1]);
 			_locations.push_back(Location(config, ++i));
+		}
+		else if (config[i] == "cgi") {
+			VALIDATE_END("Error: cgi must be followed by an extension");
+			i++;
+			VALIDATE_END("Error: cgi extension must be followed by a path");
+			_cgi[config[i]] = config[i + 1];
 		}
 		///////
 		else if (config[i] == "}")
@@ -137,7 +141,7 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 			break;
 	}
 	if (_port <= 0 || _port > 65535) {
-		std::cout << "Error: port must be 0 <= p <= 65535" << std::endl;
+		std::cout << "Error: port must be 0 <= p <= 65535, found (" << _port << ")" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	if (multiplePorts)
@@ -155,6 +159,10 @@ void Server::put( void ) {
 	std::cout << "host:     " << _host << std::endl;
 	std::cout << "root:     " << _root << std::endl;
 	std::cout << "LOCATIONS:" << std::endl;
+	std::cout << "CGI:" << std::endl;
+	for (std::map<std::string, std::string>::iterator it = _cgi.begin(); it != _cgi.end(); it++)
+		std::cout << "    cgi:   " << it->first << " -> " << it->second << std::endl;
+	std::cout << std::endl;
 	for (size_t i = 0; i < _locations.size(); i++) {
 		std::cout << "Locaton '" << _locationPaths[i] << "' :" << std::endl;
 		std::cout << "   Root: " <<  _locations[i].getRoot() << std::endl;

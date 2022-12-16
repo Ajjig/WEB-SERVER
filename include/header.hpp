@@ -48,4 +48,4 @@
 typedef std::string string;
 
 
-std::vector<Server>	parse( int ac, char ** av );
+std::vector<Server>	parse( int ac, char ** av , char ** envp);

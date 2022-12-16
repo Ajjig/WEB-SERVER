@@ -5,7 +5,6 @@ class Location {
 		Location(std::vector<std::string> & config, size_t & i);
 		~Location();
 		void setPath(std::string path);
-		std::string getPath();
 		void setRoot(std::string root);
 		std::string getRoot();
 		void addIndex(std::string index);
@@ -14,10 +13,12 @@ class Location {
 		void setAllowed(std::string allowed);
 		std::vector<std::string> getAllowed();
 		bool isAllowed(std::string method);
+		bool isAutoindex();
 
 
 	private:
 		std::string					_root;
 		std::vector<std::string>	_indexes;
 		std::vector<std::string>	_allowed;
+		bool						_autoindex;
 };
