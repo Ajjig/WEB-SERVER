@@ -164,7 +164,7 @@ void Server::put( void ) {
 		std::cout << "    cgi:   " << it->first << " -> " << it->second << std::endl;
 	std::cout << std::endl;
 	for (size_t i = 0; i < _locations.size(); i++) {
-		std::cout << "Locaton '" << _locationPaths[i] << "' :" << std::endl;
+		std::cout << "Location '" << _locationPaths[i] << "' :" << std::endl;
 		std::cout << "   Root: " <<  _locations[i].getRoot() << std::endl;
 		std::cout << "   Indexes: ";
 		for (size_t j = 0; j < _locations[i].getIndexes().size(); j++)
