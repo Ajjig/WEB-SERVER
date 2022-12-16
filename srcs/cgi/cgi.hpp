@@ -11,16 +11,18 @@ class Cgi
         std::string _bin;
         std::string _file;
         std::string _buffer;
+        Server _server;
 
+        int check_file(std::string file);
+        int check_bin(std::string bin);
+        void find_bin();
+        std::string exec_cgi();
+    
     public:
         Cgi(std::string file ,std::map<std::string, std::string> bin_path, char **envp);
         Cgi(Server server, std::string file);
         ~Cgi ();
 
-        std::string exec_cgi();
-        void find_bin();
-        int check_file(std::string file);
-        int check_bin(std::string bin);
         void set_body(std::string buf);
         std::string get_body();
         /*
