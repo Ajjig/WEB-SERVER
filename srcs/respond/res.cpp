@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 20:41:44 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 21:16:53 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,60 +38,62 @@ Respond::Respond(Request &req) {
 
         Cgi cgi(this->req.get_server(), this->req.get_uri());
         
-        this->body = cgi.get_body();
-        if (this->body == "404") {
+        std::string res = cgi.get_body();
+        if (res == "404") {
             this->status_code = 404;
-        } else if (this->body == "403") {
+            this->init_404();
+            
+            std::cout << "\n\n Header: " << this->get_header() << "\n\n" << std::endl;
+            std::cout << "body: |" << this->body << "| "<< std::endl;
+        } else if (res == "403") {
             this->status_code = 403;
-        } else if (this->body == "bin not found") {
+        } else if (res == "bin not found") {
             this->status_code = 404;
         }
         else {
+            this->body = res;
             this->status_code = 200;
             this->req.set_content_type("html");
             this->content_length = this->body.size();
             init_header();
-
         }
-        std::cout << "\n\n Header: " << this->get_header() << "\n\n" << std::endl;
 
-        std::cout << "body: " << this->body << std::endl;
-
-        return ;
-    }
-    
-    bool is_match = false;
-    for (size_t i = 0; i < locations.size(); i++) {
-        if (this->req.get_path() == req.get_server().getLocationPaths()[i]) {
-            this->location = locations[i];
-            is_match = true;
-            break;
-        }
-    }
-    // set 404 if no location match
-    if (not is_match) {
-        
-        this->status_code = 404;
-        if (this->req.get_method() == "GET") {
-            this->Get();
-        }
-        
     } else {
         
-        if (_is_exist(this->location.getRoot())) {
-            this->status_code = 200;
-        } else {
+        bool is_match = false;
+        for (size_t i = 0; i < locations.size(); i++) {
+            if (this->req.get_path() == req.get_server().getLocationPaths()[i]) {
+                this->location = locations[i];
+                is_match = true;
+                break;
+            }
+        }
+        // set 404 if no location match
+        if (not is_match) {
+            
             this->status_code = 404;
-        }
-        // allow list dir
-        this->list_is_allowed = this->location.isAutoindex();
+            if (this->req.get_method() == "GET") {
+                this->Get();
+            }
+            
+        } else {
+            
+            if (_is_exist(this->location.getRoot())) {
+                this->status_code = 200;
+            } else {
+                this->status_code = 404;
+            }
+            // allow list dir
+            this->list_is_allowed = this->location.isAutoindex();
 
-        // if method is get
-        if (this->req.get_method() == "GET") {
-            this->Get();
+            // if method is get
+            if (this->req.get_method() == "GET") {
+                this->Get();
+            }
+            
         }
-        
     }
+    
 }
 
 // setters and getters
@@ -201,6 +203,12 @@ void Respond::init_403() {
 void Respond::init_405() {
     this->status_code = 405;
     this->body = this->read_file("./srcs/default/405/405.html").str;
+    this->content_length = this->body.size();
+}
+
+void Respond::init_404() {
+    this->status_code = 404;
+    this->body = this->read_file("./srcs/default/404/404.html").str;
     this->content_length = this->body.size();
 }
 
