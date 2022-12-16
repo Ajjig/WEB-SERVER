@@ -19,15 +19,17 @@ void put_logs(int ac, char ** av, std::vector<Server> & servers) {
 
 
 	std::cout << std::endl << GREEN;
-	for (size_t i = 0; i < 80; i++) {
+	for (size_t i = 0; i < 87; i++) {
 		std::cout << "▉" << std::flush;
-		usleep(10000);
+		usleep(13069);
 	}
 	std::cout << std::endl << std::endl << YELLOW << " * " << "'" << GREEN << ( ac == 1 ? "./webserv.conf" : av[1] ) << YELLOW <<
 	"' config file was parsed successfully " <<
+	std::endl << " * " <<
 	servers.size() << " servers were found" <<
-	std::endl << " * Total locations: " << locationCount <<
+	std::endl << " * " << locationCount << " locations were found" <<
 	std::endl << std::endl << NC;
+	usleep(130690);
 }
 
 int main( int ac, char ** av, char ** envp)
