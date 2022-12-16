@@ -31,6 +31,15 @@ Cgi::~Cgi()
 
 }
 
+void  Cgi::set_status_code(int status_code)
+{
+    this->_status_code = status_code;
+}
+
+int Cgi::get_status_code()
+{
+    return (this->_status_code);
+}
 
 void Cgi::find_bin()
 {
@@ -99,6 +108,7 @@ std::string Cgi::exec_cgi()
 {
     // check for existence and permissions
     int status_bin = this->check_bin(this->_bin);
+    this->set_status_code(status_bin);
     if (status_bin != 200)
         return std::to_string(status_bin);
     

@@ -12,6 +12,7 @@ class Cgi
         std::string _file;
         std::string _buffer;
         Server _server;
+        int _status_code;
 
         int check_file(std::string file);
         int check_bin(std::string bin);
@@ -25,6 +26,8 @@ class Cgi
 
         void set_body(std::string buf);
         std::string get_body();
+        int get_status_code();
+        void set_status_code(int status_code);
         /*
            On sucess get_body() returns the body of the cgi script
             On failure get_body() returns the status code of the cgi script

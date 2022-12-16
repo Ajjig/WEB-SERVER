@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 21:16:53 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 21:20:39 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,8 @@ Respond::Respond(Request &req) {
     
     std::cout << "path: " << req.get_path() << std::endl;
     // if cgi 
-    if (req.get_path().find("/cgi-bin") != std::string::npos) {
+    if (req.get_path().find("/cgi-bin/") != std::string::npos) {
+        
         std::cout << "\n\ncgi: " << req.get_uri() <<  "\n\n" << std::endl;
 
         Cgi cgi(this->req.get_server(), this->req.get_uri());
