@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 17:50:35 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 18:14:24 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,12 @@ bool _is_exist(const std::string& name) {
 // constructors and destructors
 Respond::Respond(Request &req) {
 
+    this->req = req;
     std::cout << "======= Respond constructor ========" << std::endl;
     
-    // print vector from req.get_server().getLocations()
+    std::cout << "HERE: |" << this->req.get_path() << "|" << std::endl;
+
+    
     std::cout << "======= Locations ========" << std::endl;
 
     std::vector<Location> locations = req.get_server().getLocations();
@@ -35,7 +38,15 @@ Respond::Respond(Request &req) {
         std::cout << "Location " << i + 1 << ": " << locations[i].getRoot() << std::endl;
     }
 
-    std::cout << "======= End Locations ========" << std::endl;
+    std::cout << "======= End Locations ========\n\n" << std::endl;
+
+    // check if there is a location that match the path
+    for (size_t i = 0; i < locations.size(); i++) {
+        if (req.get_path().find(locations[i].getRoot()) != std::string::npos) {
+            std::cout << "Location " << i + 1 << " match" << std::endl;
+            break;
+        }
+    }
     
 
     // remove last '/' if exist
@@ -44,7 +55,6 @@ Respond::Respond(Request &req) {
 
     std::string path = ROOT_PATH + req.get_path();
 
-    this->req = req;
     if (_is_exist(path)) {
         this->status_code = 200;
     } else {
