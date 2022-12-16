@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:01:45 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 17:11:11 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/16 19:33:23 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,9 +113,9 @@ void Request::parse_request(std::string request)
     // parse the uri to get the path and the query
     std::string path = uri.substr(0, uri.find("?"));
 
-    // check if the path is empty
-    if (path == "/")
-        path = "/" + index;
+    //// check if the path is empty
+    //if (path == "/")
+    //    path = "/" + index;
 
     // parse the path to get the file name and the extension
     std::string file_name = path.substr(path.find_last_of("/") + 1, path.size() - path.find_last_of("/") - 1);
