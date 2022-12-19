@@ -26,6 +26,7 @@ class Server {
 		char **getEnv();
 		std::string getCGI(std::string ext);
 		std::vector<std::string> & getLocationPaths();
+		std::string getErrorPage(int code);
 
 	private:
 
@@ -40,6 +41,7 @@ class Server {
 		char **_env;
 		std::vector<std::string> _indexes;
 		std::map<std::string, std::string> _cgi;
+		std::map<int, std::string> _errorPages;
 };
 
 std::ostream & operator<<(std::ostream & out, Server const &server);

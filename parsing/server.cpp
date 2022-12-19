@@ -17,6 +17,12 @@ bool Server::isBind() {
 	return _bind;
 }
 
+std::string Server::getErrorPage(int code) {
+	if (_errorPages.find(code) != _errorPages.end())
+		return _errorPages[code];
+	return "None";
+}
+
 void Server::setBind(bool val) {
 	_bind = val;
 }
@@ -136,6 +142,18 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 			VALIDATE_END("Error: cgi extension must be followed by a path");
 			_cgi[config[i]] = config[i + 1];
 		}
+		else if (config[i] == "error_page") {
+			VALIDATE_END("Error: error_page must be followed by a number");
+			i++;
+			int err_nbr = atoi(config[i].c_str());
+			if (err_nbr < 100 || err_nbr >= 600) {
+				std::cerr << "Error: error_page must be followed by correct error number" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			VALIDATE_END("Error: error_page number must be followed by a path");
+			_errorPages[err_nbr] = config[i + 1];
+		}
+
 		///////
 		else if (config[i] == "}")
 			bracket--;
