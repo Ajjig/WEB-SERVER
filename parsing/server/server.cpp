@@ -1,4 +1,4 @@
-#include "../include/header.hpp"
+#include "../../include/header.hpp"
 
 #define VALIDATE_END(error) if (i + 1 >= config.size() || string("{:}").find(config[i + 1]) != string::npos) { \
 				std::cout << error << std::endl; \

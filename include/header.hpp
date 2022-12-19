@@ -33,8 +33,8 @@
 #include <algorithm>
 # include <dirent.h>
 
-# include "location.hpp"
-# include "Server.hpp"
+# include "../parsing/location/location.hpp"
+# include "../parsing/server/server.hpp"
 # include "../socket/socket.hpp"
 #include "../srcs/dirent/dir.hpp"
 #include "../srcs/request/req.hpp"

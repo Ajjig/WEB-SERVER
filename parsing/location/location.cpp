@@ -1,4 +1,4 @@
-#include "../include/header.hpp"
+#include "../../include/header.hpp"
 
 Location::Location(std::vector<string> & config, size_t & i) {
 	_root = "";
