@@ -105,7 +105,13 @@ Server Socket::current_server(int _master_socket_fd, std::string server_name)
 {
 	for (int i = 0; i < static_cast<int>(__server_list.size()); ++i)
 	{
-		if (this->get_port_from_fd(_master_socket_fd) == std::to_string(__server_list[i].getPort()) \
+		
+		
+		if (this->get_port_from_fd(_master_socket_fd) == std::to_string(__server_list[i].getPort()) && server_name == "Not defined")
+		{
+			return __server_list[i];
+		}
+		else if (this->get_port_from_fd(_master_socket_fd) == std::to_string(__server_list[i].getPort()) \
 			&& is_in_vector(__server_list[i].getNames(), server_name))
 		{
 			return __server_list[i];
@@ -284,7 +290,11 @@ int Socket::get_port()
 std::string Socket::parse_server_name(std::string header)
 {
 	std::string tmp = header.find("server_name: ") != std::string::npos ? header.substr(header.find("server_name: ") + 12) : "";
-	return tmp.substr(0, tmp.find("\r\n"));
+	std::string ret = tmp.substr(0, tmp.find("\r\n"));
+	if (ret == "")
+		ret = "Not defined";
+
+	return ret;
 }
 
 std::string Socket::get_http_header()
@@ -313,8 +323,8 @@ std::string Socket::read_file(char *filename)
 
 std::string Socket::construct_response()
 {
-	std::string test = current_server(master_socket, parse_server_name(get_http_header())).getName();
-	std::cout << "requested object  : " << test << std::endl;
+	// std::string name = current_server(master_socket, parse_server_name(get_http_header())).getName();
+
 	
 	Request req(get_http_header(), current_server(master_socket, parse_server_name(get_http_header())));
 	// acitve logs
@@ -325,5 +335,5 @@ std::string Socket::construct_response()
 	Respond res(req);
 
     return res.get_response();
-	//return "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n\r\n<html><body><h1>hello world</h1></body></html>";
+	// return "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n\r\n<html><body><h1>hello world</h1></body></html>";
 }
