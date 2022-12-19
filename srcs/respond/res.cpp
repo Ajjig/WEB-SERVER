@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/19 20:49:10 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/19 22:25:57 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ bool Respond::set_location() {
 Respond::Respond(Request &req) {
 
     std::cout << "\n=============================respond==============================\n\n";
+    
     this->req = req;
     bool is_match = set_location();
 
@@ -384,6 +385,7 @@ void Respond::default_page_error(std::string code, std::string msg) {
     this->body = default_template;
     this->content_length = this->body.size();
     this->content_type = "text/html";
+    init_header();
 }
 
 bool Respond::is_allowed_method(std::string method) {
