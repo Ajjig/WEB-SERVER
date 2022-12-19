@@ -156,19 +156,21 @@ void Socket::set_incoming_connection()
 void Socket::read_fd()
 {
 	n = 0;
-	while ((nread = read(fd, http_header + n, BUFSIZ-1)) > 0)
+	while ((nread = read(fd, http_header, BUFSIZ)) > 0)
 	{
-		n += nread;
+		http_header[nread] = '\0';
+		this->save_http_header += std::string(http_header);
+		bzero(http_header, BUFSIZ);
 	}
 
-	if (nread == -1 && errno != EAGAIN)
+	// if (nread == -1 && errno != EAGAIN)
+	// {
+	// 	perror("read error");
+	// 	close(fd);
+	// }
+	if (nread == 0)
 	{
-		perror("read error");
-		close(fd);
-	}
-	else if (nread == 0)
-	{
-		//perror("Client disconnected upexpectedly");
+		perror("Client disconnected upexpectedly");
 		fds[i].fd = -1;
 		nfds--;
 	}
@@ -299,7 +301,7 @@ std::string Socket::parse_server_name(std::string header)
 
 std::string Socket::get_http_header()
 {
-	return std::string(http_header);
+	return std::string(this->save_http_header);
 }
 
 std::string Socket::read_file(char *filename)
@@ -330,10 +332,10 @@ std::string Socket::construct_response()
 	// acitve logs
 	//req.req_logs();
 
-	std::cout << get_http_header() << std::endl;
+	// std::cout << "***********\n" << get_http_header() << "\n*******************" << std::endl;
 
 	Respond res(req);
-
     return res.get_response();
+	this->save_http_header = "";
 	// return "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n\r\n<html><body><h1>hello world</h1></body></html>";
 }

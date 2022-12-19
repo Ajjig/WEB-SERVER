@@ -21,6 +21,7 @@ class Socket
         std::string _host;
         std::vector<int> master_socket_list;
         std::vector<Server> __server_list;
+        std::string save_http_header;
         
         std::string construct_response();
         std::string read_file(char *filename);
