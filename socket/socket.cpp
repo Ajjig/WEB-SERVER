@@ -330,7 +330,7 @@ std::string Socket::construct_response()
 	// acitve logs
 	//req.req_logs();
 
-	std::cout << get_http_header() << std::endl;
+	//std::cout << get_http_header() << std::endl;
 
 	Respond res(req);
 
