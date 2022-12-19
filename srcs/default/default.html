@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>403 Forbidden</title>
+		<style>
+			@import url('https://fonts.googleapis.com/css?family=Comfortaa');
+			* {
+				box-sizing: border-box;
+			}
+
+			body,
+			html {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				overflow: hidden;
+			}
+
+			body {
+				background-color: #a74006;
+				font-family: sans-serif;
+			}
+
+			.container {
+				z-index: 1;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				text-align: center;
+				padding: 10px;
+				min-width: 300px;
+			}
+			.container div {
+				display: inline-block;
+			}
+
+			.container h1 {
+				font-family: 'Comfortaa', cursive;
+				font-size: 100px;
+				text-align: center;
+				color: #eee;
+				font-weight: 100;
+				margin: 0;
+			}
+			.container p {
+				color: #fff;
+			}
+
+			@-webkit-keyframes move {
+				to {
+					top: 100%;
+				}
+			}
+
+			@keyframes move {
+				to {
+					top: 100%;
+				}
+			}
+			@media (max-width: 420px) {
+				.container {
+					transform: translate(-50%, -50%) scale(0.8);
+				}
+
+				.lock.generated {
+					transform: scale(0.3);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1> ${code} </h1>
+			<p> ${msg} </p>
+		</div>
+	</body>
+</html>

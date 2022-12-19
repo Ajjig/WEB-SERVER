@@ -9,23 +9,26 @@ class Server {
 		~Server();
 		void addLocation(Location location);
 		void addIndex(std::string ind);
-		void setRoot(std::string root);
-		std::string getRoot();
-		std::vector<std::string> getIndexes();
-		std::vector<Location> getLocations();
 		void addName(std::string name);
-		std::vector<std::string> getNames();
-		void put();
-		int getPort();
-		std::string getHost();
-		std::string getName();
-		bool isBind();
+
 		void setBind(bool val);
 		void setport(int port);
+		void setRoot(std::string root);
 		void setEnv(char **envp);
+
+		std::string 				getRoot();
+		std::vector<std::string>	getIndexes();
+		std::vector<Location>		getLocations();
+		std::vector<std::string>	getNames();
+		std::vector<std::string> 	&getLocationPaths();
+		int 						getPort();
+		std::string 				getCGI(std::string ext);
+		std::string 				getHost();
+		std::string 				getName();
+
+		void put();
+		bool isBind();
 		char **getEnv();
-		std::string getCGI(std::string ext);
-		std::vector<std::string> & getLocationPaths();
 
 	private:
 

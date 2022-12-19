@@ -75,7 +75,8 @@ int Socket::set_nonblocking(int sockfd)
 
 void Socket::log_client_info(int master_socket)
 {
-	std::cout << "New request on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
+	(void)master_socket;
+	//std::cout << "New request on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
 }
 
 int Socket::current_interface_index(int _master_socket_fd)
@@ -319,8 +320,10 @@ std::string Socket::construct_response()
 	// acitve logs
 	//req.req_logs();
 
+	std::cout << get_http_header() << std::endl;
+
 	Respond res(req);
-	res.logs();
 
     return res.get_response();
+	//return "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n\r\n<html><body><h1>hello world</h1></body></html>";
 }

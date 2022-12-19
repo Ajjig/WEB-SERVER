@@ -1,8 +1,0 @@
-*.out
-*.o
-.DS_Store
-*.dSYM
-*.vscode
-*.vscode-test
-*.idea
-webserv

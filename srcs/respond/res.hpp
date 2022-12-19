@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:04:01 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 22:01:22 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/19 14:15:25 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,10 @@ class Respond
         int content_length;
         std::map<std::string, std::string> header;
         Location location;
+        std::string ROOT_PATH;
+        std::string l_path;
+        std::string content_type;
+        std::string extension;
         
     public:
         // constructors and destructors
@@ -51,12 +55,11 @@ class Respond
         std::string get_body();
         s_file read_file(std::string filename);
         bool is_allowed_method(std::string method);
-        void init_403();
-        void init_405();
-        void init_404();
-        void init_500();
+        void default_page_error(std::string code, std::string msg);
         void native_error(std::string msg);
         void logs();
+
+        bool set_location();
 
         // the response
         std::string get_response();

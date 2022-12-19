@@ -6,130 +6,184 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/16 22:43:16 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/19 20:49:10 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/header.hpp"
 
-bool _is_exist(const std::string& name) {
+bool _exist(const std::string& name) {
     bool ret;
 
-    std::ifstream f(name.c_str());
-    ret = f.good();
-    f.close();
+    std::ifstream f(name.c_str()); // open file
+    ret = f.good(); // check if file is open
+    f.close(); // close file
 
+    ////LOGS in green if file exist and in red if not
+    //if (ret)
+    //    std::cout << "\n\033[1;32mRun _exit func: ###########"<< ret <<"\n#\n# " << name << " exist\n#\n#############################\033[0m\n" << std::endl;
+    //else
+    //    std::cout << "\n\033[1;31mRun _exit func: ###########" << ret << "\n#\n# " << name << " not exist\n#\n###############################\033[0m\n" << std::endl;
+        
     return ret;
+}
+
+bool compare_paths(std::string path, std::string location) {
+
+    // if there is no / at the end of the location, add it
+    if (location[location.length() - 1] != '/') {
+        location += '/';
+    }
+
+    std::cout << "===> path: {" << path << "}==> location: {" << location << "}" << std::endl;
+        if (path == location) {
+        return true;
+    }
+
+    // Split the path into a vector
+    std::vector<std::string> pathVector;
+    std::string temp = "";
+    for (size_t i = 0; i < path.length(); i++) {
+        if (path[i] == '/') {
+            pathVector.push_back(temp);
+            temp = "";
+        } else {
+            temp += path[i];
+        }
+    }
+
+    // Split the location into a vector
+    std::vector<std::string> locationVector;
+    temp = "";
+    for (size_t i = 0; i < location.length(); i++) {
+        if (location[i] == '/') {
+            locationVector.push_back(temp);
+            temp = "";
+        } else {
+            temp += location[i];
+        }
+    }
+
+    // print the vectors
+    //std::cout << "\n=======================================================\n" << std::endl;
+    //std::cout << "Path: ---------------" << std::endl;
+    //for (size_t i = 0; i < pathVector.size(); i++) {
+    //    std::cout << "==> " << pathVector[i] << std::endl;
+    //}
+    //std::cout << "end -------------------\n\n" << std::endl;
+
+    //std::cout << "Location: ---------------- " << std::endl;
+    //for (size_t i = 0; i < locationVector.size(); i++) {
+    //    std::cout << "==> " << locationVector[i] << std::endl;
+    //}
+    //std::cout << "end -------------------" << std::endl;
+    //std::cout << "\n\n=======================================================\n" << std::endl;
+
+    // Compare the vectors
+    if (pathVector.size() < locationVector.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < locationVector.size() || i < pathVector.size(); i++) {
+        if (pathVector[i] != locationVector[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Respond::set_location() {
+    // check if there is a location that match the path
+    std::vector<Location> locations = req.get_server().getLocations();
+    this->l_path = "";
+    
+    for (size_t i = 0; i < locations.size(); i++) {
+        if (compare_paths(this->req.get_path(), req.get_server().getLocationPaths()[i])) {
+            this->location = locations[i];
+            this->l_path = req.get_server().getLocationPaths()[i];
+            return true;
+        }
+    }
+    return false;
+
 }
 
 // constructors and destructors
 Respond::Respond(Request &req) {
 
+    std::cout << "\n=============================respond==============================\n\n";
     this->req = req;
+    bool is_match = set_location();
 
-    // check if there is a location that match the path
-    std::vector<Location> locations = req.get_server().getLocations();
+    //std::cout << "\n==========info location===========\n" << std::endl;
+    //std::cout << "there is a location: " << is_match << std::endl;
+    //std::cout << "location_path: " << l_path << std::endl;
+    //std::cout << "is_allowd: " << this->location.isAllowed("GET") << std::endl;
+    //std::cout << "Root: " << this->location.getRoot() << std::endl;
+    //std::cout << "\n==================================\n" << std::endl;
+
+    // check http version if it's not 1.1 return 505
+    if (this->req.get_http_version() != "HTTP/1.1") {
+        
+        this->status_code = 505;
+        std::string code = std::to_string(this->status_code);
+        this->default_page_error(code, this->status_msg()[code]);
+        
+    } else if (is_match && this->l_path == "/cgi-bin") {
+        std::cout << "\n============= cgi =============" << this->req.get_uri() << std::endl;
+        try {
     
-    // if cgi 
-    if (req.get_path().find("/cgi-bin/") != std::string::npos) {
-        try {
-            
-            std::cout << "\n\ncgi: " << req.get_uri() <<  "\n\n" << std::endl;
-
             Cgi cgi(this->req.get_server(), this->req.get_uri());
-            
             std::string res = cgi.get_body();
-            if (res == "404") {
+            this->status_code = cgi.get_status_code();
 
-                this->status_code = 404;
-                this->init_404();
-                
-            } else if (res == "403") {
-
-                this->status_code = 403;
-
-            } else if (res == "bin not found") {
-
-                this->status_code = 404;
-                
-            }
-            else {
-
-                std::string content_type;
-                for (size_t i = 0; i < res.size(); i++) {
-                    if (res[i] == '\n') {
-                        content_type = res.substr(0, i);
-                        res = res.substr(i);
-                        break;
-                    }
-                }
-
-                // get content type value from content_type string
-                std::string value_content_type = "";
-                for (size_t i = 0; i < content_type.size(); i++) {
-                    if (content_type[i] == ':') {
-                        value_content_type = content_type.substr(i + 2);
-                        break;
-                    }
-                }
-                
+            if (this->status_code == 200) {
                 this->body = res;
-                
-                this->status_code = 200;
-                if (value_content_type == "text/html")
-                    this->req.set_content_type("html");
                 this->content_length = this->body.size();
+                this->content_type = "text/html";
                 init_header();
+            } else if (this->status_code == 404) {
+                std::string code = std::to_string(this->status_code);
+                this->default_page_error(code, this->status_msg()[code]);
             }
             
+            
         } catch (std::exception &e) {
-            std::cout << "\033[95m" << e.what() << std::endl;
+            std::string error = ("\033[101m" + std::string(e.what()) + " \033[49m\033[39m");
+            perror(error.c_str());
             this->status_code = 500;
-            this->init_500();
+            std::string code = std::to_string(this->status_code);
+            this->default_page_error(code, this->status_msg()[code]);
         }
-
+        std::cout << "\n============= end =============\n" << std::endl;
     } else {
-        try {
-            bool is_match = false;
-            for (size_t i = 0; i < locations.size(); i++) {
-                if (this->req.get_path() == req.get_server().getLocationPaths()[i]) {
-                    this->location = locations[i];
-                    is_match = true;
-                    break;
-                }
-            }
-            // set 404 if no location match
-            if (not is_match) {
-                
-                this->status_code = 404;
-                if (this->req.get_method() == "GET") {
-                    this->Get();
-                }
-                
-            } else {
-                
-                if (_is_exist(this->location.getRoot())) {
-                    this->status_code = 200;
-                } else {
-                    this->status_code = 404;
-                }
-                // allow list dir
-                this->list_is_allowed = this->location.isAutoindex();
+        
+        if (not is_match) {
 
-                // if method is get
-                if (this->req.get_method() == "GET") {
-                    this->Get();
-                }
-                
+            this->status_code = 404;
+            std::string code = std::to_string(this->status_code);
+            this->default_page_error(code, this->status_msg()[code]);
+
+        } else {
+            this->ROOT_PATH = this->location.getRoot();
+            this->list_is_allowed = this->location.isAutoindex();
+            this->status_code = 200;
+            
+            try {
+                this->Get();
+            } catch (std::exception &e) {
+                std::cout << "\033[91mERROR: " << e.what() << "\n\033[39m" << std::endl;
+                this->status_code = 500;
+                std::string code = std::to_string(this->status_code);
+                this->default_page_error(code, this->status_msg()[code]);
             }
-        } catch (std::exception &e) {
-            std::cout << "\033[95m" << e.what() << std::endl;
-            this->status_code = 500;
-            this->init_500();
         }
     }
-    
+    this->logs();
+    std::cout << "\n===============================end===============================\n";
 }
+
 
 // setters and getters
 std::string Respond::get_status_code() {
@@ -160,7 +214,15 @@ std::string Respond::get_body() {
 // methods
 
 std::string Respond::get_response() {
-    std::string response = this->get_header() + this->get_body();
+
+    std::string header = this->get_header();
+
+    std::cout << "\n============= Header =============\n" << std::endl;
+    std::cout << header << std::endl;
+    std::cout << "============= end =============\n" << std::endl;
+    
+
+    std::string response = header + this->get_body();
     return response;
 };
 
@@ -174,20 +236,23 @@ void Respond::init_header() {
     std::string status_code = this->get_status_code();
     std::string date = this->get_date();
     std::string content_length = std::to_string(this->content_length);
-    std::string content_type = this->get_type()[this->req.get_type_file()];
     std::string connection = this->req.get_headers()["Connection"];
     std::string http_version = this->req.get_http_version();
 
     // set header map
     this->header["Date"] = date;
     this->header["Content-Length"] = content_length;
-    this->header["Content-Type"] = content_type;
+    this->header["Content-Type"] = this->content_type;
     this->header["Connection"] = connection;
     this->header["Server"] = "Webserv/1.0";
     this->header["http_version"] = http_version;
     this->header["status_code"] = status_code;
-
+    // add auto index
+    if (this->list_is_allowed) {
+        this->header["autoindex"] = "on";
+    }
 }
+
 
 void Respond::init_body() {
 
@@ -195,73 +260,130 @@ void Respond::init_body() {
 
     if (this->status_code == 404) {
         // if 404
-        path = "./srcs/default/404/404.html";
-        s_file file = this->read_file(path.c_str());
-        this->body = file.str;
-        this->content_length = file.size;
+        std::string code = std::to_string(this->status_code);
+        this->default_page_error(code, this->status_msg()[code]);
         return;
         
     }
-    // if 200
-    path = this->location.getRoot();
+    // if 200 get path
+    path = this->ROOT_PATH;
+
+    // get path of the request
+    std::string req_path = this->req.get_path();
+
+    // remove location path from request path
+    std::string location = l_path;
+    for (size_t i = 0; i < location.size(); i++) {
+        req_path.erase(0, 1);
+    }
     
-    // check if file or directory
-    struct stat path_stat;
-    stat(path.c_str(), &path_stat);
-    // check if the method is allowed
+    // add req path to root path
+    path += req_path;
+
+    // get extension of the file
+    extension = path.substr(path.find_last_of("."), path.size());
+
+    // check there is no extension
+    std::cout << "path: " << path << std::endl;
+    
+    if (extension == path) {
+        // set extension to empty
+        extension = "";
+    } else {
+        // remove . from extension
+        extension.erase(0, 1);
+    }
+    
+    std::cout << "extension: " << extension << std::endl;
+    
+    // check if there is index file and it's exist
+    bool file_exist = false;
+    if (extension == "") {
+        std::string index_path = "";
+        
+        for (size_t i = 0; i < this->location.getIndexes().size(); i++) {
+            std::string index = this->location.getIndexes()[i];
+            // check if there is / in the end of the path
+            if (path[path.size() - 1] == '/') {
+                index_path = path + index;
+            } else {
+                index_path = path + "/" + index;
+            }
+            
+            if (_exist(index_path.c_str())) {
+                path = index_path;
+                file_exist = true;
+                break;
+            }
+        }
+        // update extension
+        extension = index_path.substr(index_path.find_last_of("."), index_path.size());
+        // check there is no extension
+        if (extension != path) {
+            extension.erase(0, 1);
+            this->content_type = this->get_type()[extension];
+        }
+        
+    } else {
+        if (_exist(path.c_str())) {
+            file_exist = true;
+            this->content_type = this->get_type()[extension];
+        }
+    }
+    
     if (this->is_allowed_method(this->req.get_method())) {
         // if method is allowed
-        if (S_ISDIR(path_stat.st_mode)) {
-            // if directory
-            if (this->list_is_allowed) {
-                this->list_dir(path);
-            } else {
-                this->init_403();
-            }
-        } else {
+        if (file_exist) {
+            std::cout << "@ render file" << std::endl;
             s_file file = this->read_file(path.c_str());
             this->body = file.str;
             this->content_length = file.size;
+        } else {
+            // check if the path is directory
+            struct stat sb;
+            stat(path.c_str(), &sb);
+            if (S_ISDIR(sb.st_mode)) {
+                // if it's directory
+                if (this->list_is_allowed) {
+                    this->list_dir(path);
+                } else {
+                    this->status_code = 404;
+                    std::string code = std::to_string(this->status_code);
+                    this->default_page_error(code, this->status_msg()[code]);
+                }
+            } else {
+                // if it's not directory
+                this->status_code = 404;
+                std::string code = std::to_string(this->status_code);
+                this->default_page_error(code, this->status_msg()[code]);
+            }
         }
     } else {
         // if method is not allowed
-        this->init_405();
+        std::cout << "@ method is not allowed" << std::endl;
+        this->status_code = 405;
+        std::string code = std::to_string(this->status_code);
+        this->default_page_error(code, this->status_msg()[code]);
     }
 }
 
-void Respond::init_403() {
-    this->status_code = 403;
-    this->body = this->read_file("./srcs/default/403/403.html").str;
-    this->content_length = this->body.size();
-}
+void Respond::default_page_error(std::string code, std::string msg) {
+    // read default template
+    std::string default_template = this->read_file("./srcs/default/default.html").str;
 
-void Respond::init_405() {
-    this->status_code = 405;
-    this->body = this->read_file("./srcs/default/405/405.html").str;
-    this->content_length = this->body.size();
-}
-
-void Respond::init_404() {
-    this->status_code = 404;
-    this->body = this->read_file("./srcs/default/404/404.html").str;
-    this->content_length = this->body.size();
-}
-
-void Respond::init_500() {
-    try {
-        this->status_code = 500;
-        this->body = this->read_file("./srcs/default/500/500.html").str;
-        this->content_length = this->body.size();
-    } catch (std::exception &e) {
-        this->native_error(e.what());
+    // replace code and msg in default template with the code and msg 
+    // the code is ${code} and the msg is ${msg}
+    std::string::size_type pos = default_template.find("${code}");
+    if (pos != std::string::npos) {
+        default_template.replace(pos, 7, code);
     }
-}
-
-void Respond::native_error(std::string msg) {
-    perror(msg.c_str());
-    this->status_code = 500;
-    this->body = "<html><head><title>500 Internal Server Error</title></head><body><h1>500 Internal Server Error</h1></body></html>";
+    pos = default_template.find("${msg}");
+    if (pos != std::string::npos) {
+        default_template.replace(pos, 6, msg);
+    }
+    this->body = default_template;
     this->content_length = this->body.size();
+    this->content_type = "text/html";
 }
 
 bool Respond::is_allowed_method(std::string method) {
@@ -273,9 +395,17 @@ void Respond::list_dir(std::string path) {
     std::string body = "<html><head><title>Index of " + this->req.get_path() + "</title></head><body><h1>Index of " + this->req.get_path() + "</h1><hr><pre>";
     for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it) {
         // create link to file or directory
-        std::string link = std::string(path) + "/" + *it;
+        // if there is a / in the end of the path
+        std::string link = std::string(path);
+        if (path[path.size() - 1] != '/') {
+            link += "/" + *it;
+        } else {
+            link += *it;
+        }
         // remove ROOT_PATH from path
         link.erase(0, std::string(this->location.getRoot()).size());
+        
+        link = this->l_path + link;
         // check if file or directory
         struct stat path_stat;
         stat(std::string(path + "/" + *it).c_str(), &path_stat);
@@ -293,7 +423,8 @@ void Respond::list_dir(std::string path) {
     }
     body += "</pre><hr></body></html>";
     this->body = body;
-    this->content_length = this->body.size();
+    this->content_length = body.size();
+    this->content_type = "text/html";
 }
 
 s_file Respond::read_file(std::string filename) {
@@ -316,12 +447,13 @@ s_file Respond::read_file(std::string filename) {
 }
 
 void Respond::logs() {
-    std::string method = "\e[0;33m" + this->req.get_method() + "\e[0m";
+    std::string method = this->req.get_method();
     std::string uri = "\e[0;37m" + this->req.get_path() + "\e[0m";
     std::string http_version = "\e[0;35m" + this->req.get_http_version() + "\e[0m";
     std::string respond_status = (this->status_code == 200 ? "\e[0;32m" : "\e[0;31m") + std::to_string(this->status_code) + "\e[0m";;
+    std::string date = "\e[0;36m" + this->get_date() + "\e[0m";
 
-    std::cout << "[" <<  method << "] " << respond_status << " " << uri << " " << http_version << std::endl;
+    std::cout << ("\033[43m " +  method + " \e[0m : ") << respond_status << " " << uri << " " << http_version << " " << date << std::endl;
 }
 
 
