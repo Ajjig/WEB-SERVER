@@ -1,6 +1,6 @@
 #pragma once
 
-#include "header.hpp"
+#include "../../include/header.hpp"
 
 class Server {
 	public:
@@ -29,6 +29,7 @@ class Server {
 		void put();
 		bool isBind();
 		char **getEnv();
+		std::string getErrorPage(int code);
 
 	private:
 
@@ -43,6 +44,7 @@ class Server {
 		char **_env;
 		std::vector<std::string> _indexes;
 		std::map<std::string, std::string> _cgi;
+		std::map<int, std::string> _errorPages;
 };
 
 std::ostream & operator<<(std::ostream & out, Server const &server);

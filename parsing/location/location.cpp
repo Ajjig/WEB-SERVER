@@ -1,7 +1,7 @@
-#include "../include/header.hpp"
+#include "../../include/header.hpp"
 
 Location::Location(std::vector<string> & config, size_t & i) {
-	_root = "./";
+	_root = "";
 	_indexes.push_back("index.html");
 	parse(config, i);
 }
@@ -67,7 +67,7 @@ void Location::parse(std::vector<string> & config, size_t & i) {
 			}
 		}
 		else if (config[i] == "}") {
-			return ;
+			break ;
 		}
 		else if (config[i] == "autoindex") {
 			if (config[++i] == "on")
@@ -79,5 +79,9 @@ void Location::parse(std::vector<string> & config, size_t & i) {
 				exit(EXIT_FAILURE);
 			}
 		}
+	}
+	if (not _root.size()) {
+		std::cerr << "Error: root path must be specified" << std::endl;
+		exit(EXIT_FAILURE);
 	}
 }
