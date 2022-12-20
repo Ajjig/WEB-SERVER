@@ -2,7 +2,7 @@
 
 Location::Location(std::vector<string> & config, size_t & i) {
 	_root = "";
-	_indexes.push_back("index.html");
+	_autoindex = false;
 	parse(config, i);
 }
 
@@ -52,9 +52,8 @@ void Location::parse(std::vector<string> & config, size_t & i) {
 			setRoot(config[i]);
 		}
 		else if (config[i] == "index") {
-			while (config[i] != ";") {
-				addIndex(config[i + 1]);
-				i++;
+			while (config[++i] != ";") {
+				addIndex(config[i]);
 			}
 		}
 		else if (config[i] == "allow") {

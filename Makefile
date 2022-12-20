@@ -9,19 +9,23 @@ SRCS += ${addprefix ./socket/, socket.cpp} \
 		${addprefix ./srcs/respond/, res.cpp} \
 		${addprefix ./srcs/dirent/, dir.cpp}
 
-OBJS = $(SRCS:.cpp=.o)
 INC = ./include/header.hpp
 RM = rm -rf
+OBJDIR = ./.objs
 
+OBJS = $(addprefix $(OBJDIR)/, $(SRCS:.cpp=.o))
 
 $(NAME): $(OBJS)
 	$(CC) $(CPPFLAGS) -o $(NAME) $(OBJS)
 
-%.o: %.cpp $(INC)
+$(OBJDIR)/%.o: %.cpp $(INC)
+	@mkdir -p $(dir $@)
+
 	$(CC) $(CPPFLAGS) -c $< -o $@
 
 clean:
 	$(RM) $(OBJS)
+	$(RM) $(OBJDIR)
 
 fclean: clean
 	$(RM) $(NAME)
