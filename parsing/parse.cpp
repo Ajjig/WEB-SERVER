@@ -65,8 +65,11 @@ std::vector<Server> parse( int ac, char ** av , char ** envp) {
 		std::cout << "Error: can't open the config file" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	while (std::getline(file, line))
-		buff += line;
+	while (std::getline(file, line)) {
+		if (line.find('#') != std::string::npos)
+			line = line.substr(0, line.find('#'));
+		buff += line + ";";
+	}
 	file.close();
 	split(buff, config); // split the config file into tokens
 	validate(config); // validate the config file
