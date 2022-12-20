@@ -171,28 +171,25 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 }
 
 void Server::put( void ) {
-	std::cout << "port:     " << _port << std::endl;
-	std::cout << "name:     ";
+	std::cout << RED << "PORT :    " << NC << _port << std::endl;
+	std::cout << RED << "NAMES:    " << NC;
 	for (size_t i = 0; i < _names.size(); i++)
 		std::cout << _names[i] << " ";
 	std::cout << std::endl;
-	for (size_t i = 0; i < _indexes.size(); i++)
-		std::cout << "index[0]: " << _indexes[i] << std::endl;
-	std::cout << "host:     " << _host << std::endl;
-	std::cout << "root:     " << _root << std::endl;
-	std::cout << "LOCATIONS:" << std::endl;
-	std::cout << "CGI:" << std::endl;
+	std::cout << RED << "HOST :    " << NC << _host << std::endl;
+	std::cout << RED << "CGI  :" << NC << std::endl;
 	for (std::map<std::string, std::string>::iterator it = _cgi.begin(); it != _cgi.end(); it++)
-		std::cout << "    cgi:   " << it->first << " -> " << it->second << std::endl;
+		std::cout << "           " << it->first << GREEN << "  ->  " << NC << it->second << std::endl;
 	std::cout << std::endl;
+	std::cout << RED << "LOCATIONS:" << NC << std::endl;
 	for (size_t i = 0; i < _locations.size(); i++) {
-		std::cout << "Location '" << _locationPaths[i] << "' :" << std::endl;
-		std::cout << "   Root: " <<  _locations[i].getRoot() << std::endl;
-		std::cout << "   Indexes: ";
+		std::cout << "   Location -> " << YELLOW << _locationPaths[i] << NC << " :" << std::endl;
+		std::cout << BLUE << "      Root: " << NC <<  _locations[i].getRoot() << std::endl;
+		std::cout << BLUE << "      Indexes: " << NC;
 		for (size_t j = 0; j < _locations[i].getIndexes().size(); j++)
 			std::cout << _locations[i].getIndexes()[j] << ", ";
 		std::cout << std::endl;
-		std::cout << "Allowed methods :" << std::endl << "   ";
+		std::cout << BLUE << "      Allowed methods :" << NC << " ";
 		for (size_t j = 0; j < _locations[i].getAllowed().size(); j++)
 			std::cout << _locations[i].getAllowed()[j] << ", ";
 		std::cout << std::endl;
