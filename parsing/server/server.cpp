@@ -183,7 +183,9 @@ void Server::put( void ) {
 	std::cout << std::endl;
 	std::cout << RED << "LOCATIONS:" << NC << std::endl;
 	for (size_t i = 0; i < _locations.size(); i++) {
-		std::cout << "   Location -> " << YELLOW << _locationPaths[i] << NC << " :" << std::endl;
+		std::cout << "   Location -> " << YELLOW << _locationPaths[i] << ( _locations[i].isRedirect() \
+			? (std::string(GREEN) + " >>> " + std::to_string(_locations[i].getRedirectCode()) \
+			+ " " + _locations[i].getRedirectUrl()) : "") << NC << " :" << std::endl;
 		std::cout << BLUE << "      Root: " << NC <<  _locations[i].getRoot() << std::endl;
 		std::cout << BLUE << "      Indexes: " << NC;
 		for (size_t j = 0; j < _locations[i].getIndexes().size(); j++)

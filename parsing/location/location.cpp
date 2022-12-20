@@ -3,6 +3,7 @@
 Location::Location(std::vector<string> & config, size_t & i) {
 	_root = "";
 	_autoindex = false;
+	_isRedirect = false;
 	parse(config, i);
 }
 
@@ -32,6 +33,17 @@ void Location::addIndex(string index) {
 	_indexes.push_back(index);
 }
 
+bool Location::isRedirect() {
+	return _isRedirect;
+}
+
+int Location::getRedirectCode() {
+	return _redirectCode;
+}
+
+std::string Location::getRedirectUrl() {
+	return _redirectUrl;
+}
 
 bool Location::isAutoindex() {
 	return _autoindex;
@@ -77,6 +89,22 @@ void Location::parse(std::vector<string> & config, size_t & i) {
 				std::cout << "Error: autoindex must be followed by 'on' or 'off'" << std::endl;
 				exit(EXIT_FAILURE);
 			}
+		}
+		else if (config[i] == "redirect") {
+			if (atoi(config[++i].c_str()) <= 0) {
+				std::cout << "Error: redirect code must be a positive integer" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			_redirectCode = atoi(config[i].c_str());
+			if (config[++i] != ";") {
+				_redirectUrl = config[i];
+				_isRedirect = true;
+			}
+			else {
+				std::cout << "Error: redirect must be followed by a code and a url" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
 		}
 	}
 	if (not _root.size()) {

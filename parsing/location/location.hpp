@@ -15,6 +15,9 @@ class Location {
 		std::vector<std::string> getAllowed();
 		bool isAllowed(std::string method);
 		bool isAutoindex();
+		bool isRedirect();
+		int getRedirectCode();
+		std::string getRedirectUrl();
 
 
 	private:
@@ -22,4 +25,7 @@ class Location {
 		std::vector<std::string>	_indexes;
 		std::vector<std::string>	_allowed;
 		bool						_autoindex;
+		bool						_isRedirect;
+		int							_redirectCode;
+		std::string					_redirectUrl;
 };
