@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:04:01 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/19 14:15:25 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/20 13:51:34 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Respond
         // methods
         void list_dir(std::string path);
         void Get();
+        void Post();
         void init_body();
         void init_header();
         std::string get_status_code();

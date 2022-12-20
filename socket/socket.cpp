@@ -335,7 +335,7 @@ std::string Socket::construct_response()
 	// std::cout << "***********\n" << get_http_header() << "\n*******************" << std::endl;
 
 	Respond res(req);
-    return res.get_response();
 	this->save_http_header = "";
+    return res.get_response();
 	// return "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n\r\n<html><body><h1>hello world</h1></body></html>";
 }

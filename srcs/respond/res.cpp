@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/19 22:25:57 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/20 13:54:14 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ bool compare_paths(std::string path, std::string location) {
         location += '/';
     }
 
-    std::cout << "===> path: {" << path << "}==> location: {" << location << "}" << std::endl;
+    //std::cout << "===> path: {" << path << "}==> location: {" << location << "}" << std::endl;
         if (path == location) {
         return true;
     }
@@ -63,22 +63,7 @@ bool compare_paths(std::string path, std::string location) {
             temp += location[i];
         }
     }
-
-    // print the vectors
-    //std::cout << "\n=======================================================\n" << std::endl;
-    //std::cout << "Path: ---------------" << std::endl;
-    //for (size_t i = 0; i < pathVector.size(); i++) {
-    //    std::cout << "==> " << pathVector[i] << std::endl;
-    //}
-    //std::cout << "end -------------------\n\n" << std::endl;
-
-    //std::cout << "Location: ---------------- " << std::endl;
-    //for (size_t i = 0; i < locationVector.size(); i++) {
-    //    std::cout << "==> " << locationVector[i] << std::endl;
-    //}
-    //std::cout << "end -------------------" << std::endl;
-    //std::cout << "\n\n=======================================================\n" << std::endl;
-
+    
     // Compare the vectors
     if (pathVector.size() < locationVector.size()) {
         return false;
@@ -172,7 +157,16 @@ Respond::Respond(Request &req) {
             this->status_code = 200;
             
             try {
-                this->Get();
+                if (this->req.get_method() == "GET") {
+                    this->Get();
+                }
+                else if (this->req.get_method() == "POST") {
+                    this->Post();
+                }
+                    
+                //else if (this->req.get_method() == "DELETE") {
+                //    this->Delete();   
+                //}
             } catch (std::exception &e) {
                 std::cout << "\033[91mERROR: " << e.what() << "\n\033[39m" << std::endl;
                 this->status_code = 500;
@@ -185,6 +179,12 @@ Respond::Respond(Request &req) {
     std::cout << "\n===============================end===============================\n";
 }
 
+void Respond::Post() {
+    this->body = "POST method";
+    this->content_length = this->body.size();
+    this->content_type = "text/html";
+    init_header();
+}
 
 // setters and getters
 std::string Respond::get_status_code() {
@@ -218,9 +218,9 @@ std::string Respond::get_response() {
 
     std::string header = this->get_header();
 
-    std::cout << "\n============= Header =============\n" << std::endl;
-    std::cout << header << std::endl;
-    std::cout << "============= end =============\n" << std::endl;
+    //std::cout << "\n============= Header =============\n" << std::endl;
+    //std::cout << header << std::endl;
+    //std::cout << "============= end =============\n" << std::endl;
     
 
     std::string response = header + this->get_body();
@@ -279,6 +279,13 @@ void Respond::init_body() {
     }
     
     // add req path to root path
+    // check if there is / at the start of req path if there is remove it
+    if (req_path[0] == '/') {
+        req_path.erase(0, 1);
+    }
+    //if (path[path.size() - 1] == '/') {
+    //    path.erase(path.size() - 1, 1);
+    //}
     path += req_path;
 
     // get extension of the file
@@ -300,16 +307,19 @@ void Respond::init_body() {
     // check if there is index file and it's exist
     bool file_exist = false;
     if (extension == "") {
-        std::string index_path = "";
         
+        std::string index_path = "";
+        std::string index = "";
+        // check if there is index file
         for (size_t i = 0; i < this->location.getIndexes().size(); i++) {
-            std::string index = this->location.getIndexes()[i];
+            index = this->location.getIndexes()[i];
             // check if there is / in the end of the path
             if (path[path.size() - 1] == '/') {
                 index_path = path + index;
             } else {
                 index_path = path + "/" + index;
             }
+            std::cout << "===============> index_path: " << index_path << std::endl;
             
             if (_exist(index_path.c_str())) {
                 path = index_path;
@@ -319,13 +329,23 @@ void Respond::init_body() {
         }
         // update extension
         extension = index_path.substr(index_path.find_last_of("."), index_path.size());
-        // check there is no extension
+        // check if there is extension
         if (extension != path) {
+            // remove . from extension
             extension.erase(0, 1);
+            // set content type
             this->content_type = this->get_type()[extension];
+        }
+
+        // send redirect to index file
+        if (file_exist) {
+            this->status_code = 301;
+            this->header["Location"] = index;
+            return;
         }
         
     } else {
+        // if there is extension
         if (_exist(path.c_str())) {
             file_exist = true;
             this->content_type = this->get_type()[extension];
@@ -335,7 +355,7 @@ void Respond::init_body() {
     if (this->is_allowed_method(this->req.get_method())) {
         // if method is allowed
         if (file_exist) {
-            std::cout << "@ render file" << std::endl;
+            // if file exist
             s_file file = this->read_file(path.c_str());
             this->body = file.str;
             this->content_length = file.size;
@@ -344,16 +364,18 @@ void Respond::init_body() {
             struct stat sb;
             stat(path.c_str(), &sb);
             if (S_ISDIR(sb.st_mode)) {
-                // if it's directory
+                // if it's directory, check if it's allowed to list directory content or not
                 if (this->list_is_allowed) {
+                    // if it's allowed to list directory content
                     this->list_dir(path);
                 } else {
+                    // if it's not allowed to list directory content, return 404
                     this->status_code = 404;
                     std::string code = std::to_string(this->status_code);
                     this->default_page_error(code, this->status_msg()[code]);
                 }
             } else {
-                // if it's not directory
+                // if it's not directory, return 404
                 this->status_code = 404;
                 std::string code = std::to_string(this->status_code);
                 this->default_page_error(code, this->status_msg()[code]);
@@ -361,7 +383,6 @@ void Respond::init_body() {
         }
     } else {
         // if method is not allowed
-        std::cout << "@ method is not allowed" << std::endl;
         this->status_code = 405;
         std::string code = std::to_string(this->status_code);
         this->default_page_error(code, this->status_msg()[code]);

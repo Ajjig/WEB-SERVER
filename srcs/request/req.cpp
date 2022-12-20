@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:01:45 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/19 14:33:33 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/20 14:38:22 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,16 +88,34 @@ Server &Request::get_server() {
 //    this->file_type = file_type;
 //}
 
+bool create_file_using_body(std::string &body) {
+    std::ofstream file;
+    file.open("./html/upload/tmp.jpeg");
+    if (file.is_open()) {
+        file << body;
+        file.close();
+        return true;
+    }
+    return false;
+}
+
 void Request::parse_request(std::string request)
 {
-    //std::cout << request << std::endl;
 
-    //return ;
+    // cut header from body
+    std::string header = request.substr(0, request.find("\r\n\r\n"));
+    std::string body = request.substr(request.find("\r\n\r\n") + 4);
     
-    // need to replace this with the actual path and index file name later that will be passed as arguments
-    //std::string root_path = "./html";
-    //std::string index = "index.html";
-    //// end 
+    request = header;
+
+    //std::cout << header << std::endl;
+    //if (create_file_using_body(body))
+    //    std::cout << "file created" << std::endl;
+    //else
+    //    std::cout << "file not created" << std::endl;
+
+    ////return;
+
 
     // split the request into lines
     std::vector<std::string> lines;
@@ -137,39 +155,6 @@ void Request::parse_request(std::string request)
         }
     }
 
-    
-    // parse the uri to get the path and the query
-    //std::string path = uri.substr(0, uri.find("?"));
-
-
-    //// parse the path to get the file name and the extension
-    //std::string file_name = path.substr(path.find_last_of("/") + 1, path.size() - path.find_last_of("/") - 1);
-    //std::string extension = file_name.substr(file_name.find_last_of(".") + 1, file_name.size() - file_name.find_last_of(".") - 1);
-    
-    
-    //this->file_name = file_name;
-    //this->file_type = extension;
-    //this->respond_status = is_exist(root_path + path) ? 200 : 404;
-
-    
-    //// parse the query to get the query parameters and store them in a map
-    //std::string query = uri.substr(uri.find("?") + 1, uri.size() - uri.find("?") - 1);
-    //// check if the query is empty
-    //if (uri.find("?") != std::string::npos) {
-    //    // split the query into query parameters
-    //    std::vector<std::string> query_params;
-    //    std::string query_param;
-    //    std::stringstream ss(query);
-    //    while (getline(ss, query_param, '&'))
-    //        query_params.push_back(query_param);
-        
-    //    for (int i = 0; i < (int )query_params.size(); i++)
-    //    {
-    //        std::string query_param_name = query_params[i].substr(0, query_params[i].find("="));
-    //        std::string query_param_value = query_params[i].substr(query_params[i].find("=") + 1, query_params[i].size() - query_params[i].find("=") - 1);
-    //        this->query[query_param_name] = query_param_value;
-    //    }
-    //}
     
 
     //// print all header values
