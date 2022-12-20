@@ -26,7 +26,8 @@ void validate(std::vector<string> & config) {
 		}
 		else if (config[i] == "}") {
 			if (stack.empty()) {
-				throw std::runtime_error("Error: invalid config ( missing '{' )");
+				std::cerr << "Error: invalid config ( missing '{' )" << std::endl;
+				exit(EXIT_FAILURE);
 			}
 			else {
 				stack.pop();
@@ -34,7 +35,8 @@ void validate(std::vector<string> & config) {
 		}
 	}
 	if (!stack.empty()) {
-		throw std::runtime_error("Error: invalid config ( missing '}' )");
+		std::cerr << "Error: invalid config ( missing '}' )" << std::endl;
+		exit(EXIT_FAILURE);
 	}
 }
 
