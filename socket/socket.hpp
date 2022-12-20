@@ -14,7 +14,7 @@ class Socket
         socklen_t addrlen;
         int master_socket, incoming_connection, N_Files_discriptors, pfd, fd, i, nread, n;
         struct sockaddr_in local, remote;
-        char http_header[BUFSIZ];
+        // char http_header[BUFSIZ];
         int close_connection;
         int REQ_COUNT;
         int _port;

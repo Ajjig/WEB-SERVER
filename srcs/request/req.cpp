@@ -90,7 +90,7 @@ Server &Request::get_server() {
 
 bool create_file_using_body(std::string &body) {
     std::ofstream file;
-    file.open("./html/upload/tmp.jpeg");
+    file.open("./html/upload/tmp.png");
     if (file.is_open()) {
         file << body;
         file.close();
@@ -109,8 +109,8 @@ void Request::parse_request(std::string request)
     request = header;
 
     //std::cout << header << std::endl;
-    //if (create_file_using_body(body))
-    //    std::cout << "file created" << std::endl;
+    if (create_file_using_body(body))
+       std::cout << "file created" << std::endl;
     //else
     //    std::cout << "file not created" << std::endl;
 

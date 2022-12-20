@@ -155,12 +155,15 @@ void Socket::set_incoming_connection()
 
 void Socket::read_fd()
 {
-	n = 0;
-	while ((nread = read(fd, http_header, BUFSIZ)) > 0)
+	this->save_http_header = "";
+
+	int nread;
+	char buffer[1024];
+	while ( (nread = read(fd, buffer, sizeof(buffer))) > 0)
 	{
-		http_header[nread] = '\0';
-		this->save_http_header += std::string(http_header);
-		bzero(http_header, BUFSIZ);
+		std::string str(buffer, nread);
+		this->save_http_header += str;
+		usleep(100);
 	}
 
 	// if (nread == -1 && errno != EAGAIN)
@@ -328,14 +331,14 @@ std::string Socket::construct_response()
 	// std::string name = current_server(master_socket, parse_server_name(get_http_header())).getName();
 
 	
-	Request req(get_http_header(), current_server(master_socket, parse_server_name(get_http_header())));
 	// acitve logs
 	//req.req_logs();
 
 	// std::cout << "***********\n" << get_http_header() << "\n*******************" << std::endl;
 
+	Request req(get_http_header(), current_server(master_socket, parse_server_name(get_http_header())));
 	Respond res(req);
-	this->save_http_header = "";
     return res.get_response();
+
 	// return "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n\r\n<html><body><h1>hello world</h1></body></html>";
 }

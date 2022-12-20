@@ -40,7 +40,7 @@ int main( int ac, char ** av, char ** envp)
 	put_logs(ac, av, servers);
 
 	servers[0].put();
-	exit(0);
+	// exit(0);
 	Socket socket(servers);
 	socket.start();
 
