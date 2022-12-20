@@ -11,7 +11,7 @@ SRCS += ${addprefix ./socket/, socket.cpp} \
 
 INC = ./include/header.hpp
 RM = rm -rf
-OBJDIR = ./objs
+OBJDIR = ./.objs
 
 OBJS = $(addprefix $(OBJDIR)/, $(SRCS:.cpp=.o))
 
@@ -25,6 +25,7 @@ $(OBJDIR)/%.o: %.cpp $(INC)
 
 clean:
 	$(RM) $(OBJS)
+	$(RM) $(OBJDIR)
 
 fclean: clean
 	$(RM) $(NAME)

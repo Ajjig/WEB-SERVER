@@ -10,5 +10,5 @@ webserv
 main_cgi.cpp
 a.out
 *.swp
-objs/
-objs/*
+.objs/
+.objs/*
