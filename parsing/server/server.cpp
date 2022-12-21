@@ -92,6 +92,10 @@ std::vector<std::string> Server::getNames() {
 	return _names;
 }
 
+size_t Server::getMaxBodySize() {
+	return _maxBodySize;
+}
+
 void Server::addName(std::string name) {
 	_names.push_back(name);
 }
@@ -152,6 +156,10 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 			}
 			VALIDATE_END("Error: error_page number must be followed by a path");
 			_errorPages[err_nbr] = config[i + 1];
+		}
+		else if (config[i] == "max_body_size") {
+			VALIDATE_END("Error: max_body_size must be followed by a number");
+			_maxBodySize = atoi(config[i + 1].c_str());
 		}
 
 		///////

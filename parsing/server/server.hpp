@@ -20,11 +20,12 @@ class Server {
 		std::vector<std::string>	getIndexes();
 		std::vector<Location>		getLocations();
 		std::vector<std::string>	getNames();
-		std::vector<std::string> 	&getLocationPaths();
+		std::vector<std::string>	&getLocationPaths();
 		int 						getPort();
 		std::string 				getCGI(std::string ext);
 		std::string 				getHost();
 		std::string 				getName();
+		size_t 						getMaxBodySize();
 
 		void put();
 		bool isBind();
@@ -45,6 +46,7 @@ class Server {
 		std::vector<std::string> _indexes;
 		std::map<std::string, std::string> _cgi;
 		std::map<int, std::string> _errorPages;
+		size_t _maxBodySize;
 };
 
 std::ostream & operator<<(std::ostream & out, Server const &server);
