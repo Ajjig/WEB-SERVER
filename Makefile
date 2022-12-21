@@ -21,7 +21,9 @@ $(NAME): $(OBJS)
 $(OBJDIR)/%.o: %.cpp $(INC)
 	@mkdir -p $(dir $@)
 
-	$(CC) $(CPPFLAGS) -c $< -o $@
+	@printf "\033[1;31m[ ◯ ] $< ...\033[0m %s"
+	@$(CC) $(CPPFLAGS) -c $< -o $@
+	@printf "\033[0K\r\033[32m[ ✔ ]    $<\033[0m %s\n"
 
 clean:
 	$(RM) $(OBJS)
