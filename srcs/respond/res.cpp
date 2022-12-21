@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/20 13:54:14 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/21 17:45:25 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,6 @@ bool _exist(const std::string& name) {
     std::ifstream f(name.c_str()); // open file
     ret = f.good(); // check if file is open
     f.close(); // close file
-
-    ////LOGS in green if file exist and in red if not
-    //if (ret)
-    //    std::cout << "\n\033[1;32mRun _exit func: ###########"<< ret <<"\n#\n# " << name << " exist\n#\n#############################\033[0m\n" << std::endl;
-    //else
-    //    std::cout << "\n\033[1;31mRun _exit func: ###########" << ret << "\n#\n# " << name << " not exist\n#\n###############################\033[0m\n" << std::endl;
-        
     return ret;
 }
 
@@ -99,6 +92,9 @@ Respond::Respond(Request &req) {
 
     std::cout << "\n=============================respond==============================\n\n";
     
+    // print request header 
+    std::cout << req.get_header_as_string() << std::endl;
+    
     this->req = req;
     bool is_match = set_location();
 
@@ -157,13 +153,26 @@ Respond::Respond(Request &req) {
             this->status_code = 200;
             
             try {
-                if (this->req.get_method() == "GET") {
+                if (!this->is_allowed_method(this->req.get_method())) {
+                    this->status_code = 405;
+                    std::string code = std::to_string(this->status_code);
+                    this->default_page_error(code, this->status_msg()[code]);
+                    return;
+                }
+                else if (this->req.get_method() == "GET") {
                     this->Get();
                 }
                 else if (this->req.get_method() == "POST") {
                     this->Post();
                 }
-                    
+                else if (this->req.get_method() == "DELETE") {
+                    this->Delete();
+                }
+                else {
+                    this->status_code = 405;
+                    std::string code = std::to_string(this->status_code);
+                    this->default_page_error(code, this->status_msg()[code]);
+                }
                 //else if (this->req.get_method() == "DELETE") {
                 //    this->Delete();   
                 //}
@@ -179,11 +188,61 @@ Respond::Respond(Request &req) {
     std::cout << "\n===============================end===============================\n";
 }
 
+void Respond::Delete() {
+    std::string path = this->ROOT_PATH;
+    
+    // get file name from path
+    std::string file_name = this->req.get_path();
+    std::string::size_type pos = file_name.find_last_of('/');
+    if (pos != std::string::npos) {
+        file_name.erase(0, pos + 1);
+    }
+    path += file_name;
+
+    std::cout << "path: " << path << std::endl;
+    
+    if (remove(path.c_str()) != 0) {
+        this->status_code = 404;
+    } else {
+        this->status_code = 200;
+    }
+    std::string code = std::to_string(this->status_code);
+    this->default_page_error(code, this->status_msg()[code]);
+}
+
 void Respond::Post() {
-    this->body = "POST method";
-    this->content_length = this->body.size();
-    this->content_type = "text/html";
-    init_header();
+    // get file name from path
+    std::string file_name = this->req.get_path();
+    std::string::size_type pos = file_name.find_last_of('/');
+    if (
+        pos != std::string::npos ||
+        static_cast<size_t>(std::stoi(this->req.get_headers()["Content-Length"])) != this->req.get_body().size() ||
+        this->req.get_body().empty())
+    {
+        file_name.erase(0, pos + 1);
+        // create file for body of request
+        std::string path = this->ROOT_PATH + file_name;
+        std::ofstream file(path, std::ios::out | std::ios::trunc);
+        
+        if (file) {
+            file << this->req.get_body();
+            file.close();
+            this->status_code = 200;
+            std::string code = std::to_string(this->status_code);
+            this->default_page_error(code, this->status_msg()[code]);
+        } else {
+            // server error
+            this->status_code = 400;
+            std::string code = std::to_string(this->status_code);
+            this->default_page_error(code, this->status_msg()[code]);
+        }
+    }
+    else {
+        this->status_code = 400;
+        std::string code = std::to_string(this->status_code);
+        this->default_page_error(code, this->status_msg()[code]);
+        return;
+    }
 }
 
 // setters and getters
@@ -352,40 +411,32 @@ void Respond::init_body() {
         }
     }
     
-    if (this->is_allowed_method(this->req.get_method())) {
-        // if method is allowed
-        if (file_exist) {
-            // if file exist
-            s_file file = this->read_file(path.c_str());
-            this->body = file.str;
-            this->content_length = file.size;
-        } else {
-            // check if the path is directory
-            struct stat sb;
-            stat(path.c_str(), &sb);
-            if (S_ISDIR(sb.st_mode)) {
-                // if it's directory, check if it's allowed to list directory content or not
-                if (this->list_is_allowed) {
-                    // if it's allowed to list directory content
-                    this->list_dir(path);
-                } else {
-                    // if it's not allowed to list directory content, return 404
-                    this->status_code = 404;
-                    std::string code = std::to_string(this->status_code);
-                    this->default_page_error(code, this->status_msg()[code]);
-                }
+    if (file_exist) {
+        // if file exist
+        s_file file = this->read_file(path.c_str());
+        this->body = file.str;
+        this->content_length = file.size;
+    } else {
+        // check if the path is directory
+        struct stat sb;
+        stat(path.c_str(), &sb);
+        if (S_ISDIR(sb.st_mode)) {
+            // if it's directory, check if it's allowed to list directory content or not
+            if (this->list_is_allowed) {
+                // if it's allowed to list directory content
+                this->list_dir(path);
             } else {
-                // if it's not directory, return 404
+                // if it's not allowed to list directory content, return 404
                 this->status_code = 404;
                 std::string code = std::to_string(this->status_code);
                 this->default_page_error(code, this->status_msg()[code]);
             }
+        } else {
+            // if it's not directory, return 404
+            this->status_code = 404;
+            std::string code = std::to_string(this->status_code);
+            this->default_page_error(code, this->status_msg()[code]);
         }
-    } else {
-        // if method is not allowed
-        this->status_code = 405;
-        std::string code = std::to_string(this->status_code);
-        this->default_page_error(code, this->status_msg()[code]);
     }
 }
 
@@ -395,13 +446,21 @@ void Respond::default_page_error(std::string code, std::string msg) {
 
     // replace code and msg in default template with the code and msg 
     // the code is ${code} and the msg is ${msg}
-    std::string::size_type pos = default_template.find("${code}");
-    if (pos != std::string::npos) {
-        default_template.replace(pos, 7, code);
+    while (1) {
+        std::string::size_type pos = default_template.find("${code}");
+        if (pos != std::string::npos) {
+            default_template.replace(pos, 7, code);
+        } else {
+            break;
+        }
     }
-    pos = default_template.find("${msg}");
-    if (pos != std::string::npos) {
-        default_template.replace(pos, 6, msg);
+    while (1) {
+       std::string::size_type pos = default_template.find("${msg}");
+        if (pos != std::string::npos) {
+            default_template.replace(pos, 6, msg);
+        } else {
+            break;
+        }
     }
     this->body = default_template;
     this->content_length = this->body.size();
@@ -428,7 +487,7 @@ void Respond::list_dir(std::string path) {
         // remove ROOT_PATH from path
         link.erase(0, std::string(this->location.getRoot()).size());
         
-        link = this->l_path + link;
+        link = this->l_path + "/" + link;
         // check if file or directory
         struct stat path_stat;
         stat(std::string(path + "/" + *it).c_str(), &path_stat);
@@ -436,8 +495,14 @@ void Respond::list_dir(std::string path) {
         if (S_ISDIR(path_stat.st_mode)) {
             // if directory
             // handle /. directories
-            if (*it == ".")
+            if (*it == ".") {
+                body += "<a href=\"/\">" + *it + "/</a><br>";
                 continue;
+            }
+            else if (*it == "..") {
+                body += "<a href=\"../\">" + *it + "/</a><br>";
+                continue;
+            }
             body += "<a href=\"" + link + "/\">" + *it + "/</a><br>";
         } else {
             // if file
@@ -633,6 +698,7 @@ std::map<std::string, std::string> Respond::status_msg()
     msgs[ "508" ] = "Loop Detected";
     msgs[ "510" ] = "Not Extended";
     msgs[ "511" ] = "Network Authentication Required";
+    msgs[ "520" ] = "Unknown Error";
 
     return msgs;
 }

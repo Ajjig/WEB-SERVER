@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:02:05 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/18 21:25:50 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/21 14:41:34 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ class Request {
         //std::string                         file_name;
         //std::string                         file_type;
         Server                              server;
+        std::string                         body;
+        std::string                         header_as_string;
 
     public:
         // constructors and destructors
@@ -36,7 +38,7 @@ class Request {
         
         // setters and getters
         Server                              &get_server(void);
-        std::map<std::string, std::string>  get_headers(void);
+        std::map<std::string, std::string>  &get_headers(void);
         std::string                         &get_method(void);
         std::string                         &get_uri(void);
         std::string                         &get_http_version(void);
@@ -46,6 +48,8 @@ class Request {
         // methods
         void                                parse_request(std::string request);
         void                                set_path(std::string path);
+        std::string                         &get_body(void);
+        std::string                         &get_header_as_string(void);
         //std::string                         get_type_file(void);
         //std::string                         get_file_name(void);
         //void                                set_content_type(std::string file_type);

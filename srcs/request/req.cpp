@@ -6,22 +6,11 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:01:45 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/20 14:38:22 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/21 14:41:47 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/header.hpp"
-
-//bool is_exist (const std::string& name) {
-//    std::ifstream f(name.c_str());
-//    return f.good();
-//}
-
-// constructors
-//Request::Request(std::string request)
-//{
-//    this->parse_request(request);
-//}
 
 Request::Request(std::string request, Server server) {
     this->parse_request(request);
@@ -29,7 +18,7 @@ Request::Request(std::string request, Server server) {
 };
 
 // setters and getters
-std::map<std::string, std::string> Request::get_headers(void)
+std::map<std::string, std::string> &Request::get_headers(void)
 {
     return this->headers;
 }
@@ -54,25 +43,10 @@ std::string &Request::get_http_version(void)
     return this->http_version;
 }
 
-//int Request::get_respond_status(void)
-//{
-//    return this->respond_status;
-//}
-
 std::string &Request::get_path(void)
 {
     return this->path;
 }
-
-//std::string Request::get_type_file(void)
-//{
-//    return this->file_type;
-//}
-
-//std::string Request::get_file_name(void)
-//{
-//    return this->file_name;
-//}
 
 void Request::set_path(std::string path)
 {
@@ -83,10 +57,13 @@ Server &Request::get_server() {
     return this->server;
 }
 
-//void Request::set_content_type(std::string file_type)
-//{
-//    this->file_type = file_type;
-//}
+std::string &Request::get_body() {
+    return this->body;
+}
+
+std::string &Request::get_header_as_string() {
+    return this->header_as_string;
+}
 
 bool create_file_using_body(std::string &body) {
     std::ofstream file;
@@ -107,11 +84,13 @@ void Request::parse_request(std::string request)
     std::string body = request.substr(request.find("\r\n\r\n") + 4);
     
     request = header;
+    this->header_as_string = header;
+    this->body = body;
 
     //std::cout << header << std::endl;
-    if (create_file_using_body(body))
-       std::cout << "file created" << std::endl;
-    //else
+    //if (create_file_using_body(body))
+    //   std::cout << "file created" << std::endl;
+    ////else
     //    std::cout << "file not created" << std::endl;
 
     ////return;
