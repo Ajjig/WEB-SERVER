@@ -16,21 +16,23 @@ OBJDIR = ./.build
 OBJS = $(addprefix $(OBJDIR)/, $(SRCS:.cpp=.o))
 
 $(NAME): $(OBJS)
-	$(CC) $(CPPFLAGS) -o $(NAME) $(OBJS)
+	@$(CC) $(CPPFLAGS) -o $(NAME) $(OBJS)
+	@printf "Compiled <\033[1;32m$(NAME)\033[0m%s> successfully\n"
 
 $(OBJDIR)/%.o: %.cpp $(INC)
 	@mkdir -p $(dir $@)
 
 	@printf "\033[1;31m[ ◯ ] $< ...\033[0m %s"
 	@$(CC) $(CPPFLAGS) -c $< -o $@
-	@printf "\033[0K\r\033[32m[ ✔ ]    $<\033[0m %s\n"
+	@printf "\033[0K\r\033[32m    [ ✔ ] $<\033[0m %s\n"
 
 clean:
-	$(RM) $(OBJS)
-	$(RM) $(OBJDIR)
+	@$(RM) $(OBJS)
+	@$(RM) $(OBJDIR)
+	@echo CLEANED
 
 fclean: clean
-	$(RM) $(NAME)
+	@$(RM) $(NAME)
 
 re: fclean all
 
