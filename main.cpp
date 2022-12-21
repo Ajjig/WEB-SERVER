@@ -39,7 +39,7 @@ int main( int ac, char ** av, char ** envp)
 	std::vector<Server> servers = parse(ac, av, envp);
 	put_logs(ac, av, servers);
 
-	// servers[0].put(); // for debug
+	servers[0].put(); // for debug
 
 	Socket socket(servers);
 	socket.start();

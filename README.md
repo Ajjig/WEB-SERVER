@@ -1,1 +1,2 @@
 # WEB-SERVER
+A HTTP web server is a piece of software that listens for incoming HTTP requests and sends back responses. It allows users to access web content and resources through a web browser or other HTTP client.

@@ -1,1 +1,2 @@
 - check if the host in the header is not duplicated else return 400 Bad Request
+- inherit list directories from the parent directory 

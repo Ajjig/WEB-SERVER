@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/21 17:48:18 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/21 22:46:28 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,8 @@ Respond::Respond(Request &req) {
         std::string code = std::to_string(this->status_code);
         this->default_page_error(code, this->status_msg()[code]);
         
-    } else if (is_match && this->l_path == "/cgi-bin") {
+    }
+    else if (is_match && this->l_path == "/cgi-bin") {
         std::cout << "\n============= cgi =============" << this->req.get_uri() << std::endl;
         try {
     
@@ -139,7 +140,8 @@ Respond::Respond(Request &req) {
             this->default_page_error(code, this->status_msg()[code]);
         }
         std::cout << "\n============= end =============\n" << std::endl;
-    } else {
+    }
+    else {
         
         if (not is_match) {
 
@@ -311,6 +313,9 @@ void Respond::init_header() {
     if (this->list_is_allowed) {
         this->header["autoindex"] = "on";
     }
+    if (this->location.isRedirect()) {
+        this->header["Location"] = this->location.getRedirectUrl();
+    }
 }
 
 
@@ -324,6 +329,14 @@ void Respond::init_body() {
         this->default_page_error(code, this->status_msg()[code]);
         return;
         
+    }
+    // check is the location has redirect
+    else if (this->location.isRedirect()) {
+        this->status_code = this->location.getRedirectCode();
+        std::string code = std::to_string(this->status_code);
+        this->default_page_error(code, this->status_msg()[code]);
+        init_header();
+        return;
     }
     // if 200 get path
     path = this->ROOT_PATH;
