@@ -156,14 +156,22 @@ void Socket::set_incoming_connection()
 void Socket::read_fd()
 {
 	this->save_http_header = "";
-
+	size_t body;
 	int nread;
 	char buffer[1024];
+	body = 0;
 	while ( (nread = read(fd, buffer, sizeof(buffer))) > 0)
 	{
+		body += nread;
 		std::string str(buffer, nread);
 		this->save_http_header += str;
 		usleep(100);
+		if (body > current_server(master_socket, parse_server_name(get_http_header())).getMaxBodySize())
+		{
+			std::cout << "Body size is too big : " << body << std::endl;
+			this->save_http_header = "";
+			break;
+		}
 	}
 
 	// if (nread == -1 && errno != EAGAIN)
