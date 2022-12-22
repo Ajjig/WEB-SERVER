@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-print('Content-Type: text/html')    # HTML is following
+print('Content-Type: text/html\r\n')    # HTML is following
 
-print('')                             # blank line, end of headers
+print('\r\n')                             # blank line, end of headers
 
 
 # content

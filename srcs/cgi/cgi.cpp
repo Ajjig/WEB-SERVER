@@ -20,7 +20,6 @@ Cgi::Cgi(Server server, std::string file) : _file(file) , _server(server)
             if (root[root.length() - 1] == '/')
                 root = root.substr(0, root.length() - 1);
             this->_file = root + this->_file;
-            std::cout << "file: " << this->_file << std::endl;
         }
     }
     this->envp = server.getEnv();
@@ -96,7 +95,6 @@ std::string Cgi::exec_cgi()
 {
     // check for existence and permissions
     int status_bin = this->check_bin(this->_bin);
-    std::cout << "status_bin: " << status_bin << std::endl;
     this->set_status_code(status_bin);
     if (status_bin != 200)
         return std::to_string(status_bin);
@@ -127,6 +125,8 @@ std::string Cgi::exec_cgi()
     }
     else
     {
+        // wait if child is not done
+        waitpid(pid, NULL, 0);
         dup2(fd[0], 0);
         close(fd[0]);
         close(fd[1]);

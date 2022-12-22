@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/22 21:59:54 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 22:57:03 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,7 @@ bool compare_paths(std::string path, std::string location) {
         location += '/';
     }
 
-    std::cout << "===> path: {" << path << "}==> location: {" << location << "}" << std::endl;
-        if (path == location) {
+    if (path == location) {
         return true;
     }
 
@@ -90,7 +89,6 @@ bool Respond::set_location() {
 // constructors and destructors
 Respond::Respond(Request &req) {
 
-    std::cout << "\n=============================respond==============================\n\n";
     if (req.is_bad_request() == true) {
         std::cout << "bad request" << std::endl;
         this->status_code = 400;
@@ -103,14 +101,7 @@ Respond::Respond(Request &req) {
     this->req = req;
     bool is_match = set_location();
     this->is_redirect = this->location.isRedirect();
-
-    //std::cout << "\n==========info location===========\n" << std::endl;
-    //std::cout << "there is a location: " << is_match << std::endl;
-    //std::cout << "location_path: " << l_path << std::endl;
-    //std::cout << "is_allowd: " << this->location.isAllowed("GET") << std::endl;
-    //std::cout << "Root: " << this->location.getRoot() << std::endl;
-    //std::cout << "\n==================================\n" << std::endl;
-
+    
     // check http version if it's not 1.1 return 505
     if (this->req.get_http_version() != "HTTP/1.1") {
         
@@ -120,32 +111,41 @@ Respond::Respond(Request &req) {
         
     }
     else if (is_match && this->l_path == "/cgi-bin") {
-        std::cout << "\n============= cgi =============" << this->req.get_uri() << std::endl;
         try {
     
             Cgi cgi(this->req.get_server(), this->req.get_uri());
             std::string res = cgi.get_body();
-            this->status_code = cgi.get_status_code();
 
+            // if there is no header, return 500
+            if (res == "") {
+                this->status_code = 500;
+                std::string code = std::to_string(this->status_code);
+                this->default_page_error(code, this->status_msg()[code]);
+                return;
+            }
+            // split the body into header and body
+            std::string header = res.substr(0, res.find("\r\n\r\n"));
+            res = res.substr(res.find("\n"), res.length());
+            
+            this->status_code = cgi.get_status_code();
             if (this->status_code == 200) {
                 this->body = res;
                 this->content_length = this->body.size();
-                this->content_type = "text/html";
+                // set content type
+                std::string content_type = header.substr(header.find("Content-Type: ") + 14, header.find("\r\n") - 14);
+                this->content_type = content_type;
                 init_header();
-            } else if (this->status_code == 404) {
+            } else {
                 std::string code = std::to_string(this->status_code);
                 this->default_page_error(code, this->status_msg()[code]);
             }
             
             
         } catch (std::exception &e) {
-            std::string error = ("\033[101m" + std::string(e.what()) + " \033[49m\033[39m");
-            perror(error.c_str());
             this->status_code = 500;
             std::string code = std::to_string(this->status_code);
             this->default_page_error(code, this->status_msg()[code]);
         }
-        std::cout << "\n============= end =============\n" << std::endl;
     }
     else {
         
@@ -181,11 +181,7 @@ Respond::Respond(Request &req) {
                     std::string code = std::to_string(this->status_code);
                     this->default_page_error(code, this->status_msg()[code]);
                 }
-                //else if (this->req.get_method() == "DELETE") {
-                //    this->Delete();   
-                //}
             } catch (std::exception &e) {
-                std::cout << "\033[91mERROR: " << e.what() << "\n\033[39m" << std::endl;
                 this->status_code = 500;
                 std::string code = std::to_string(this->status_code);
                 this->default_page_error(code, this->status_msg()[code]);
@@ -193,7 +189,6 @@ Respond::Respond(Request &req) {
         }
     }
     this->logs();
-    std::cout << "\n===============================end===============================\n";
 }
 
 void Respond::Delete() {
@@ -203,8 +198,6 @@ void Respond::Delete() {
     std::string file_name = this->req.get_headers()["FILE_NAME"];
     path += file_name;
 
-    std::cout << "path: " << path << std::endl;
-    
     if (remove(path.c_str()) != 0) {
         this->status_code = 404;
     } else {
@@ -267,12 +260,6 @@ std::string Respond::get_body() {
 std::string Respond::get_response() {
 
     std::string header = this->get_header();
-
-    //std::cout << "\n============= Header =============\n" << std::endl;
-    //std::cout << header << std::endl;
-    //std::cout << "============= end =============\n" << std::endl;
-    
-
     std::string response = header + this->get_body();
     return response;
 };
@@ -291,7 +278,6 @@ void Respond::init_header() {
     std::string status_code = this->get_status_code();
     std::string date = this->get_date();
     std::string content_length = std::to_string(this->content_length);
-    //std::string connection = this->req.get_headers()["Connection"];
     std::string connection = "close";
     std::string cookies = this->req.get_headers()["Cookie"];
 
@@ -355,9 +341,6 @@ void Respond::init_body() {
     // get extension of the file
     extension = path.substr(path.find_last_of("."), path.size());
 
-    // check there is no extension
-    std::cout << "path: " << path << std::endl;
-    
     if (extension == path) {
         // set extension to empty
         extension = "";
@@ -365,9 +348,7 @@ void Respond::init_body() {
         // remove . from extension
         extension.erase(0, 1);
     }
-    
-    std::cout << "extension: " << extension << std::endl;
-    
+
     // check if there is index file and it's exist
     bool file_exist = false;
     if (extension == "") {
