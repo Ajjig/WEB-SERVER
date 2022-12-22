@@ -16,7 +16,11 @@ Cgi::Cgi(Server server, std::string file) : _file(file) , _server(server)
         {
             // remove the /cgi-bin from the file path using find   
             this->_file = this->_file.substr(this->_file.find(server.getLocationPaths()[i]) + server.getLocationPaths()[i].length());
-            this->_file =  server.getLocations()[i].getRoot() + this->_file;
+            std::string root = server.getLocations()[i].getRoot();
+            if (root[root.length() - 1] == '/')
+                root = root.substr(0, root.length() - 1);
+            this->_file = root + this->_file;
+            std::cout << "file: " << this->_file << std::endl;
         }
     }
     this->envp = server.getEnv();
@@ -92,6 +96,7 @@ std::string Cgi::exec_cgi()
 {
     // check for existence and permissions
     int status_bin = this->check_bin(this->_bin);
+    std::cout << "status_bin: " << status_bin << std::endl;
     this->set_status_code(status_bin);
     if (status_bin != 200)
         return std::to_string(status_bin);

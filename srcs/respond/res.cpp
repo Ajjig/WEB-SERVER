@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/22 19:08:40 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 21:59:54 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ bool compare_paths(std::string path, std::string location) {
         location += '/';
     }
 
-    //std::cout << "===> path: {" << path << "}==> location: {" << location << "}" << std::endl;
+    std::cout << "===> path: {" << path << "}==> location: {" << location << "}" << std::endl;
         if (path == location) {
         return true;
     }
@@ -268,9 +268,9 @@ std::string Respond::get_response() {
 
     std::string header = this->get_header();
 
-    std::cout << "\n============= Header =============\n" << std::endl;
-    std::cout << header << std::endl;
-    std::cout << "============= end =============\n" << std::endl;
+    //std::cout << "\n============= Header =============\n" << std::endl;
+    //std::cout << header << std::endl;
+    //std::cout << "============= end =============\n" << std::endl;
     
 
     std::string response = header + this->get_body();
