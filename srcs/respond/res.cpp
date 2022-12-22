@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/22 18:47:53 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 19:08:40 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,6 +277,10 @@ std::string Respond::get_response() {
     return response;
 };
 
+std::string &Respond::get_cookie() {
+    return this->req.get_headers()["Cookie"];
+}
+
 void Respond::Get() {
     this->init_body();
     this->init_header();
@@ -289,6 +293,7 @@ void Respond::init_header() {
     std::string content_length = std::to_string(this->content_length);
     //std::string connection = this->req.get_headers()["Connection"];
     std::string connection = "close";
+    std::string cookies = this->req.get_headers()["Cookie"];
 
 
     // set header map
@@ -299,6 +304,7 @@ void Respond::init_header() {
     this->header["Connection"] = connection;
     this->header["Server"] = "Webserv/1.0";
     this->header["status_code"] = status_code;
+    this->header["Cookie"] = cookies;
     // add auto index
     if (this->list_is_allowed) {
         this->header["autoindex"] = "on";
