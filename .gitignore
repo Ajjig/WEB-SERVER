@@ -12,3 +12,5 @@ a.out
 *.swp
 .objs/
 .objs/*
+.build/
+.build/*
