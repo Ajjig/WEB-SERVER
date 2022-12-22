@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:01:45 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/21 14:41:47 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 18:24:00 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,20 +65,20 @@ std::string &Request::get_header_as_string() {
     return this->header_as_string;
 }
 
-bool create_file_using_body(std::string &body) {
-    std::ofstream file;
-    file.open("./html/upload/tmp.png");
-    if (file.is_open()) {
-        file << body;
-        file.close();
-        return true;
-    }
-    return false;
+bool &Request::is_bad_request() {
+    return this->bad_request;
 }
 
 void Request::parse_request(std::string request)
 {
-
+    this->bad_request = false;
+    // check if the request is empty
+    if (request.empty())
+    {
+        this->bad_request = true;
+        return;
+    }
+    
     // cut header from body
     std::string header = request.substr(0, request.find("\r\n\r\n"));
     std::string body = request.substr(request.find("\r\n\r\n") + 4);
@@ -86,14 +86,6 @@ void Request::parse_request(std::string request)
     request = header;
     this->header_as_string = header;
     this->body = body;
-
-    //std::cout << header << std::endl;
-    //if (create_file_using_body(body))
-    //   std::cout << "file created" << std::endl;
-    ////else
-    //    std::cout << "file not created" << std::endl;
-
-    ////return;
 
 
     // split the request into lines
@@ -133,10 +125,4 @@ void Request::parse_request(std::string request)
             // skip the line
         }
     }
-
-    
-
-    //// print all header values
-    // for (std::map<std::string, std::string>::iterator it = this->headers.begin(); it != this->headers.end(); it++)
-    //     std::cout << it->first << " : " << it->second << std::endl;
 }

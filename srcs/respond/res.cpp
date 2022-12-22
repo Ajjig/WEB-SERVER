@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/22 17:43:21 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 18:24:21 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,9 +91,12 @@ bool Respond::set_location() {
 Respond::Respond(Request &req) {
 
     std::cout << "\n=============================respond==============================\n\n";
-
-    // print request header 
-    std::cout << req.get_header_as_string() << std::endl;
+    if (req.is_bad_request() == true) {
+        this->status_code = 400;
+        std::string code = std::to_string(this->status_code);
+        this->default_page_error(code, this->status_msg()[code]);
+        return;
+    }
     
     this->req = req;
     bool is_match = set_location();

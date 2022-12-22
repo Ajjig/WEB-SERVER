@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 16:02:05 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/21 14:41:34 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 18:23:49 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class Request {
         Server                              server;
         std::string                         body;
         std::string                         header_as_string;
+        bool                                bad_request;
 
     public:
         // constructors and destructors
@@ -50,6 +51,7 @@ class Request {
         void                                set_path(std::string path);
         std::string                         &get_body(void);
         std::string                         &get_header_as_string(void);
+        bool                                &is_bad_request(void);
         //std::string                         get_type_file(void);
         //std::string                         get_file_name(void);
         //void                                set_content_type(std::string file_type);
