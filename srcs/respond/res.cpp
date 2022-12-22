@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/22 22:57:03 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 23:06:41 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,6 @@ Respond::Respond(Request &req) {
                     this->status_code = 405;
                     std::string code = std::to_string(this->status_code);
                     this->default_page_error(code, this->status_msg()[code]);
-                    return;
                 }
                 else if (this->req.get_method() == "GET") {
                     this->Get();

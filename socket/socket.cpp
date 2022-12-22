@@ -71,7 +71,7 @@ int Socket::set_nonblocking(int sockfd)
 void Socket::log_client_info(int master_socket)
 {
 	(void)master_socket;
-	std::cout << "New request on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
+	//std::cout << "New request on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
 }
 
 int Socket::current_interface_index(int _master_socket_fd)
