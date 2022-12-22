@@ -26,11 +26,6 @@ int Socket::init_socket(int defined_port, std::string defined_host)
 		exit(1);
 	}
 
-	if( (master_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("sockfd ");
-        exit(1);
-    }
-
 	bzero(&local, sizeof(local));
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = inet_addr((_host.c_str()));
@@ -76,7 +71,7 @@ int Socket::set_nonblocking(int sockfd)
 void Socket::log_client_info(int master_socket)
 {
 	(void)master_socket;
-	//std::cout << "New request on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
+	std::cout << "New request on " << "Port : \033[32m" << get_port_from_fd(master_socket) << "\033[0m"<<std::endl;
 }
 
 int Socket::current_interface_index(int _master_socket_fd)
@@ -174,11 +169,10 @@ void Socket::read_fd()
 		}
 	}
 
-	// if (nread == -1 && errno != EAGAIN)
-	// {
-	// 	perror("read error");
-	// 	close(fd);
-	// }
+	if (nread == -1 && errno != EAGAIN)
+	{
+		close(fd);
+	}
 	if (nread == 0)
 	{
 		perror("Client disconnected upexpectedly");
@@ -296,7 +290,7 @@ void Socket::start()
 
 int Socket::get_port()
 {
-	return _port; // to be changed later
+	return _port;
 }
 
 // Private methods
@@ -336,17 +330,7 @@ std::string Socket::read_file(char *filename)
 
 std::string Socket::construct_response()
 {
-	// std::string name = current_server(master_socket, parse_server_name(get_http_header())).getName();
-
-	
-	// acitve logs
-	//req.req_logs();
-
-	// std::cout << "***********\n" << get_http_header() << "\n*******************" << std::endl;
-
 	Request req(get_http_header(), current_server(master_socket, parse_server_name(get_http_header())));
 	Respond res(req);
     return res.get_response();
-
-	// return "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n\r\n<html><body><h1>hello world</h1></body></html>";
 }
