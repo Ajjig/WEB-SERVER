@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:04:01 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/21 20:29:30 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 18:44:00 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class Respond
         std::string l_path;
         std::string content_type;
         std::string extension;
+        bool is_redirect;
         
     public:
         // constructors and destructors

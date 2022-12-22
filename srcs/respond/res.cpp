@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/22 18:24:21 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 18:47:53 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,9 @@ Respond::Respond(Request &req) {
 
     std::cout << "\n=============================respond==============================\n\n";
     if (req.is_bad_request() == true) {
+        std::cout << "bad request" << std::endl;
         this->status_code = 400;
+        this->is_redirect = false;
         std::string code = std::to_string(this->status_code);
         this->default_page_error(code, this->status_msg()[code]);
         return;
@@ -100,6 +102,7 @@ Respond::Respond(Request &req) {
     
     this->req = req;
     bool is_match = set_location();
+    this->is_redirect = this->location.isRedirect();
 
     //std::cout << "\n==========info location===========\n" << std::endl;
     //std::cout << "there is a location: " << is_match << std::endl;
@@ -265,9 +268,9 @@ std::string Respond::get_response() {
 
     std::string header = this->get_header();
 
-    //std::cout << "\n============= Header =============\n" << std::endl;
-    //std::cout << header << std::endl;
-    //std::cout << "============= end =============\n" << std::endl;
+    std::cout << "\n============= Header =============\n" << std::endl;
+    std::cout << header << std::endl;
+    std::cout << "============= end =============\n" << std::endl;
     
 
     std::string response = header + this->get_body();
@@ -284,22 +287,23 @@ void Respond::init_header() {
     std::string status_code = this->get_status_code();
     std::string date = this->get_date();
     std::string content_length = std::to_string(this->content_length);
-    std::string connection = this->req.get_headers()["Connection"];
-    std::string http_version = this->req.get_http_version();
+    //std::string connection = this->req.get_headers()["Connection"];
+    std::string connection = "close";
+
 
     // set header map
+    this->header["http_version"] = "HTTP/1.1";
     this->header["Date"] = date;
     this->header["Content-Length"] = content_length;
     this->header["Content-Type"] = this->content_type;
     this->header["Connection"] = connection;
     this->header["Server"] = "Webserv/1.0";
-    this->header["http_version"] = http_version;
     this->header["status_code"] = status_code;
     // add auto index
     if (this->list_is_allowed) {
         this->header["autoindex"] = "on";
     }
-    if (this->location.isRedirect()) {
+    if (this->is_redirect) {
         this->header["Location"] = this->location.getRedirectUrl();
     }
 }
