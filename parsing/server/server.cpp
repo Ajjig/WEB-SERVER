@@ -160,6 +160,10 @@ void Server::parse(std::vector<string> & config, size_t & i) {
 		else if (config[i] == "max_body_size") {
 			VALIDATE_END("Error: max_body_size must be followed by a number");
 			_maxBodySize = atoi(config[i + 1].c_str());
+			if (_maxBodySize < 1024) {
+				std::cerr << "Error: max_body_size must be at least 1024 bytes" << std::endl;
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		///////
