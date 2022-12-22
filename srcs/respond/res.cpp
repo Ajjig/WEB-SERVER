@@ -6,7 +6,7 @@
 /*   By: roudouch <roudouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 19:14:31 by roudouch          #+#    #+#             */
-/*   Updated: 2022/12/21 22:46:28 by roudouch         ###   ########.fr       */
+/*   Updated: 2022/12/22 17:43:21 by roudouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ bool Respond::set_location() {
 Respond::Respond(Request &req) {
 
     std::cout << "\n=============================respond==============================\n\n";
-    
+
     // print request header 
     std::cout << req.get_header_as_string() << std::endl;
     
@@ -194,11 +194,7 @@ void Respond::Delete() {
     std::string path = this->ROOT_PATH;
     
     // get file name from path
-    std::string file_name = this->req.get_path();
-    std::string::size_type pos = file_name.find_last_of('/');
-    if (pos != std::string::npos) {
-        file_name.erase(0, pos + 1);
-    }
+    std::string file_name = this->req.get_headers()["FILE_NAME"];
     path += file_name;
 
     std::cout << "path: " << path << std::endl;
@@ -213,37 +209,24 @@ void Respond::Delete() {
 }
 
 void Respond::Post() {
-    // get file name from path
-    std::string file_name = this->req.get_path();
-    std::string::size_type pos = file_name.find_last_of('/');
-    if (
-        pos != std::string::npos ||
-        static_cast<size_t>(std::stoi(this->req.get_headers()["Content-Length"])) != this->req.get_body().size() ||
-        this->req.get_body().empty())
-    {
-        file_name.erase(0, pos + 1);
-        // create file for body of request
-        std::string path = this->ROOT_PATH + file_name;
-        std::ofstream file(path, std::ios::out | std::ios::trunc);
-        
-        if (file) {
-            file << this->req.get_body();
-            file.close();
-            this->status_code = 200;
-            std::string code = std::to_string(this->status_code);
-            this->default_page_error(code, this->status_msg()[code]);
-        } else {
-            // server error
-            this->status_code = 400;
-            std::string code = std::to_string(this->status_code);
-            this->default_page_error(code, this->status_msg()[code]);
-        }
-    }
-    else {
+    // get file name from headers of request
+    std::string file_name = this->req.get_headers()["FILE_NAME"];
+
+    // create file for body of request
+    std::string path = this->ROOT_PATH + file_name;
+    std::ofstream file(path);
+
+    if (file) {
+        file << this->req.get_body();
+        file.close();
+        this->status_code = 200;
+        std::string code = std::to_string(this->status_code);
+        this->default_page_error(code, this->status_msg()[code]);
+    } else {
+        // server error
         this->status_code = 400;
         std::string code = std::to_string(this->status_code);
         this->default_page_error(code, this->status_msg()[code]);
-        return;
     }
 }
 
@@ -328,7 +311,6 @@ void Respond::init_body() {
         std::string code = std::to_string(this->status_code);
         this->default_page_error(code, this->status_msg()[code]);
         return;
-        
     }
     // check is the location has redirect
     else if (this->location.isRedirect()) {
@@ -355,9 +337,6 @@ void Respond::init_body() {
     if (req_path[0] == '/') {
         req_path.erase(0, 1);
     }
-    //if (path[path.size() - 1] == '/') {
-    //    path.erase(path.size() - 1, 1);
-    //}
     path += req_path;
 
     // get extension of the file
@@ -391,7 +370,6 @@ void Respond::init_body() {
             } else {
                 index_path = path + "/" + index;
             }
-            std::cout << "===============> index_path: " << index_path << std::endl;
             
             if (_exist(index_path.c_str())) {
                 path = index_path;
@@ -454,6 +432,20 @@ void Respond::init_body() {
 }
 
 void Respond::default_page_error(std::string code, std::string msg) {
+
+    // code to int 
+    int code_int = std::stoi(code);
+    std::string error_page = this->req.get_server().getErrorPage(code_int);
+    // check if there is error page is exist
+    if (_exist(error_page.c_str())) {
+        this->body = this->read_file(error_page.c_str()).str;
+        this->content_length = this->body.size();
+        this->content_type = "text/html";
+        init_header();
+        
+        return;
+    }
+    
     // read default template
     std::string default_template = this->read_file("./srcs/default/default.html").str;
 
